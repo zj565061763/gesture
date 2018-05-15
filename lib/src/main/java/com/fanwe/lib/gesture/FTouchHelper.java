@@ -61,8 +61,6 @@ public class FTouchHelper
     private float mUpX;
     private float mUpY;
 
-    private Direction mDirection = Direction.None;
-
     public void setDebug(boolean debug)
     {
         mIsDebug = debug;
@@ -86,8 +84,6 @@ public class FTouchHelper
             case MotionEvent.ACTION_DOWN:
                 mDownX = mCurrentX;
                 mDownY = mCurrentY;
-
-                setDirection(Direction.None);
                 break;
             case MotionEvent.ACTION_MOVE:
                 mMoveX = mCurrentX;
@@ -96,7 +92,6 @@ public class FTouchHelper
             case MotionEvent.ACTION_UP:
                 mUpX = mCurrentX;
                 mUpY = mCurrentY;
-
                 resetTag();
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -207,81 +202,6 @@ public class FTouchHelper
     public float getUpY()
     {
         return mUpY;
-    }
-
-    /**
-     * 保存水平方向
-     *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
-     * @return
-     */
-    public boolean saveDirectionHorizontalFrom(int event)
-    {
-        if (mDirection == Direction.MoveLeft || mDirection == Direction.MoveRight)
-        {
-            return true;
-        }
-        final int dx = (int) getDeltaXFrom(event);
-        if (dx == 0)
-        {
-            return false;
-        }
-
-        if (dx < 0)
-        {
-            setDirection(Direction.MoveLeft);
-        } else if (dx > 0)
-        {
-            setDirection(Direction.MoveRight);
-        }
-        return true;
-    }
-
-    /**
-     * 保存竖直方向
-     *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
-     * @return
-     */
-    public boolean saveDirectionVerticalFrom(int event)
-    {
-        if (mDirection == Direction.MoveTop || mDirection == Direction.MoveBottom)
-        {
-            return true;
-        }
-        final int dy = (int) getDeltaYFrom(event);
-        if (dy == 0)
-        {
-            return false;
-        }
-
-        if (dy < 0)
-        {
-            setDirection(Direction.MoveTop);
-        } else if (dy > 0)
-        {
-            setDirection(Direction.MoveBottom);
-        }
-        return true;
-    }
-
-    private void setDirection(Direction direction)
-    {
-        mDirection = direction;
-        if (mIsDebug)
-        {
-            Log.i(TAG, "setDirection:" + direction);
-        }
-    }
-
-    /**
-     * 返回已保存的移动方向
-     *
-     * @return
-     */
-    public Direction getDirection()
-    {
-        return mDirection;
     }
 
     /**
@@ -525,27 +445,6 @@ public class FTouchHelper
     }
 
     //----------static method end----------
-
-    public enum Direction
-    {
-        None,
-        /**
-         * 向左移动
-         */
-        MoveLeft,
-        /**
-         * 向上移动
-         */
-        MoveTop,
-        /**
-         * 向右移动
-         */
-        MoveRight,
-        /**
-         * 向下移动
-         */
-        MoveBottom,
-    }
 
     public StringBuilder getDebugInfo()
     {
