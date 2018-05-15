@@ -35,16 +35,6 @@ public class FScroller
 
     private int mLastX;
     private int mLastY;
-
-    /**
-     * 两次computeScrollOffset()之间x移动的距离
-     */
-    private int mDeltaX;
-    /**
-     * 两次computeScrollOffset()之间y移动的距离
-     */
-    private int mDeltaY;
-
     private boolean mIsFinished = true;
 
     private Callback mCallback;
@@ -184,17 +174,17 @@ public class FScroller
         final int currX = mScroller.getCurrX();
         final int currY = mScroller.getCurrY();
 
-        mDeltaX = currX - mLastX;
-        mDeltaY = currY - mLastY;
+        final int dx = currX - mLastX;
+        final int dy = currY - mLastY;
 
         mLastX = currX;
         mLastY = currY;
 
         if (compute)
         {
-            if (mDeltaX != 0 || mDeltaY != 0)
+            if (dx != 0 || dy != 0)
             {
-                if (mCallback != null) mCallback.onScroll(mDeltaX, mDeltaY);
+                if (mCallback != null) mCallback.onScroll(dx, dy);
             }
         }
 
@@ -208,26 +198,6 @@ public class FScroller
     {
         mScroller.abortAnimation();
         updateFinished();
-    }
-
-    /**
-     * 两次computeScrollOffset()之间x移动的距离
-     *
-     * @return
-     */
-    public int getDeltaX()
-    {
-        return mDeltaX;
-    }
-
-    /**
-     * 两次computeScrollOffset()之间y移动的距离
-     *
-     * @return
-     */
-    public int getDeltaY()
-    {
-        return mDeltaY;
     }
 
     /**
@@ -279,8 +249,8 @@ public class FScroller
         /**
          * 调用{@link FScroller#computeScrollOffset()}后触发
          *
-         * @param dx x应该移动的距离
-         * @param dy y应该移动的距离
+         * @param dx x移动的距离
+         * @param dy y移动的距离
          */
         void onScroll(int dx, int dy);
     }
