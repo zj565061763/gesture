@@ -27,16 +27,16 @@ public class FGestureManager
     private final FTagTouchHelper mTouchHelper = new FTagTouchHelper()
     {
         @Override
-        public void setTagIntercept(boolean tagIntercept)
+        protected void onTagInterceptChanged(boolean tagIntercept)
         {
-            super.setTagIntercept(tagIntercept);
+            super.onTagInterceptChanged(tagIntercept);
             mCallback.onTagInterceptChanged(tagIntercept);
         }
 
         @Override
-        public void setTagConsume(boolean tagConsume)
+        protected void onTagConsumeChanged(boolean tagConsume)
         {
-            super.setTagConsume(tagConsume);
+            super.onTagConsumeChanged(tagConsume);
             mCallback.onTagConsumeChanged(tagConsume);
         }
     };
@@ -211,9 +211,9 @@ public class FGestureManager
         /**
          * 是否需要拦截发生变化
          *
-         * @param intercept
+         * @param tagIntercept
          */
-        public void onTagInterceptChanged(boolean intercept)
+        public void onTagInterceptChanged(boolean tagIntercept)
         {
         }
 
@@ -239,9 +239,9 @@ public class FGestureManager
         /**
          * 是否需要消费发生变化
          *
-         * @param consume
+         * @param tagConsume
          */
-        public void onTagConsumeChanged(boolean consume)
+        public void onTagConsumeChanged(boolean tagConsume)
         {
         }
 

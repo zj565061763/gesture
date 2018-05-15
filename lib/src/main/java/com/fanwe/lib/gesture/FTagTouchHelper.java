@@ -50,7 +50,7 @@ public class FTagTouchHelper extends FTouchHelper
     /**
      * 重置tag
      */
-    public void resetTag()
+    public final void resetTag()
     {
         setTagIntercept(false);
         setTagConsume(false);
@@ -61,9 +61,13 @@ public class FTagTouchHelper extends FTouchHelper
      *
      * @param tagIntercept
      */
-    public void setTagIntercept(boolean tagIntercept)
+    public final void setTagIntercept(boolean tagIntercept)
     {
-        mTagIntercept = tagIntercept;
+        if (mTagIntercept != tagIntercept)
+        {
+            mTagIntercept = tagIntercept;
+            onTagInterceptChanged(tagIntercept);
+        }
     }
 
     /**
@@ -71,7 +75,7 @@ public class FTagTouchHelper extends FTouchHelper
      *
      * @return
      */
-    public boolean isTagIntercept()
+    public final boolean isTagIntercept()
     {
         return mTagIntercept;
     }
@@ -81,9 +85,13 @@ public class FTagTouchHelper extends FTouchHelper
      *
      * @param tagConsume
      */
-    public void setTagConsume(boolean tagConsume)
+    public final void setTagConsume(boolean tagConsume)
     {
-        mTagConsume = tagConsume;
+        if (mTagConsume != tagConsume)
+        {
+            mTagConsume = tagConsume;
+            onTagConsumeChanged(tagConsume);
+        }
     }
 
     /**
@@ -91,8 +99,16 @@ public class FTagTouchHelper extends FTouchHelper
      *
      * @return
      */
-    public boolean isTagConsume()
+    public final boolean isTagConsume()
     {
         return mTagConsume;
+    }
+
+    protected void onTagInterceptChanged(boolean tagIntercept)
+    {
+    }
+
+    protected void onTagConsumeChanged(boolean tagConsume)
+    {
     }
 }
