@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 
-import com.fanwe.lib.gesture.FTouchHelper;
+import com.fanwe.lib.gesture.FTagTouchHelper;
 
 public class MainActivity extends AppCompatActivity
 {
-    private final FTouchHelper mTouchHelper = new FTouchHelper();
+    private final FTagTouchHelper mTouchHelper = new FTagTouchHelper();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)

@@ -25,7 +25,7 @@ public class FGestureManager
     private final Context mContext;
     private VelocityTracker mVelocityTracker;
     private boolean mHasConsumed;
-    private final FTouchHelper mTouchHelper = new FTouchHelper()
+    private final FTagTouchHelper mTouchHelper = new FTagTouchHelper()
     {
         @Override
         public void setTagIntercept(boolean tagIntercept)
@@ -71,7 +71,7 @@ public class FGestureManager
         }
     }
 
-    public FTouchHelper getTouchHelper()
+    public FTagTouchHelper getTouchHelper()
     {
         return mTouchHelper;
     }
@@ -177,8 +177,8 @@ public class FGestureManager
             final int touchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
 
             final long duration = event.getEventTime() - event.getDownTime();
-            final int dx = (int) getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
-            final int dy = (int) getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
+            final int dx = (int) getTouchHelper().getDeltaXFrom(FTagTouchHelper.EVENT_DOWN);
+            final int dy = (int) getTouchHelper().getDeltaYFrom(FTagTouchHelper.EVENT_DOWN);
 
             if (duration < clickTimeout && dx < touchSlop && dy < touchSlop)
             {
