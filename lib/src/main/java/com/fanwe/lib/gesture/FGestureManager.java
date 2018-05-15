@@ -71,7 +71,7 @@ public class FGestureManager
         }
     }
 
-    public FTagTouchHelper getTouchHelper()
+    public FTouchHelper getTouchHelper()
     {
         return mTouchHelper;
     }
