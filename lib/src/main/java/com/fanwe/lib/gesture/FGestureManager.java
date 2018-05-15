@@ -88,6 +88,39 @@ public class FGestureManager
     }
 
     /**
+     * 是否是点击事件
+     *
+     * @param event
+     * @param context
+     * @return
+     */
+    public boolean isClick(MotionEvent event, Context context)
+    {
+        if (event.getAction() == MotionEvent.ACTION_UP)
+        {
+            final long clickTimeout = ViewConfiguration.getPressedStateDuration() + ViewConfiguration.getTapTimeout();
+            final int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+
+            final long duration = event.getEventTime() - event.getDownTime();
+            final int dx = (int) getTouchHelper().getDeltaXFrom(FTagTouchHelper.EVENT_DOWN);
+            final int dy = (int) getTouchHelper().getDeltaYFrom(FTagTouchHelper.EVENT_DOWN);
+
+            if (duration < clickTimeout && dx < touchSlop && dy < touchSlop)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void reset()
+    {
+        releaseVelocityTracker();
+        mHasConsumed = false;
+    }
+
+    /**
      * 外部调用
      *
      * @param event
@@ -107,8 +140,7 @@ public class FGestureManager
         {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                releaseVelocityTracker();
-                mHasConsumed = false;
+                reset();
                 break;
             default:
                 if (mCallback.shouldInterceptTouchEvent(event))
@@ -140,8 +172,7 @@ public class FGestureManager
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 mCallback.onConsumeEventFinish(event, getVelocityTracker());
-                releaseVelocityTracker();
-                mHasConsumed = false;
+                reset();
                 break;
             default:
                 if (mTouchHelper.isTagConsume())
@@ -162,33 +193,6 @@ public class FGestureManager
         }
 
         return mTouchHelper.isTagConsume();
-    }
-
-    /**
-     * 是否是点击事件
-     *
-     * @param event
-     * @param context
-     * @return
-     */
-    public boolean isClick(MotionEvent event, Context context)
-    {
-        if (event.getAction() == MotionEvent.ACTION_UP)
-        {
-            final long clickTimeout = ViewConfiguration.getPressedStateDuration() + ViewConfiguration.getTapTimeout();
-            final int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-
-            final long duration = event.getEventTime() - event.getDownTime();
-            final int dx = (int) getTouchHelper().getDeltaXFrom(FTagTouchHelper.EVENT_DOWN);
-            final int dy = (int) getTouchHelper().getDeltaYFrom(FTagTouchHelper.EVENT_DOWN);
-
-            if (duration < clickTimeout && dx < touchSlop && dy < touchSlop)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     public abstract static class Callback

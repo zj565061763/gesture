@@ -36,8 +36,6 @@ public class FTouchHelper
      */
     public static final int EVENT_LAST = 1;
 
-    private boolean mIsIdle = true;
-
     private float mCurrentX;
     private float mCurrentY;
     private float mLastX;
@@ -67,8 +65,6 @@ public class FTouchHelper
      */
     public void processTouchEvent(MotionEvent ev)
     {
-        mIsIdle = false;
-
         mLastX = mCurrentX;
         mLastY = mCurrentY;
 
@@ -88,14 +84,10 @@ public class FTouchHelper
             case MotionEvent.ACTION_UP:
                 mUpX = mCurrentX;
                 mUpY = mCurrentY;
-
-                mIsIdle = true;
                 break;
             case MotionEvent.ACTION_CANCEL:
                 mCancelX = mCurrentX;
                 mCancelY = mCurrentY;
-
-                mIsIdle = true;
                 break;
             default:
                 break;
@@ -106,11 +98,6 @@ public class FTouchHelper
             StringBuilder sb = getDebugInfo();
             Log.i(getClass().getSimpleName(), "event " + ev.getAction() + ":" + sb.toString());
         }
-    }
-
-    public boolean isIdle()
-    {
-        return mIsIdle;
     }
 
     public float getCurrentX()
