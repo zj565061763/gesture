@@ -190,9 +190,12 @@ public class FScroller
         mLastX = currX;
         mLastY = currY;
 
-        if (compute && (mDeltaX != 0 || mDeltaY != 0))
+        if (compute)
         {
-            if (mCallback != null) mCallback.onScroll(mDeltaX, mDeltaY);
+            if (mDeltaX != 0 || mDeltaY != 0)
+            {
+                if (mCallback != null) mCallback.onScroll(mDeltaX, mDeltaY);
+            }
         }
 
         return compute;
