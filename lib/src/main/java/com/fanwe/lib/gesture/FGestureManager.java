@@ -22,7 +22,6 @@ import android.view.ViewConfiguration;
 
 public class FGestureManager
 {
-    private final Context mContext;
     private VelocityTracker mVelocityTracker;
     private boolean mHasConsumed;
     private final FTagTouchHelper mTouchHelper = new FTagTouchHelper()
@@ -44,12 +43,9 @@ public class FGestureManager
 
     private final Callback mCallback;
 
-    public FGestureManager(Context context, Callback callback)
+    public FGestureManager(Callback callback)
     {
-        if (context == null) throw new NullPointerException("context is null");
         if (callback == null) throw new NullPointerException("callback is null");
-
-        mContext = context.getApplicationContext();
         mCallback = callback;
     }
 
@@ -71,6 +67,11 @@ public class FGestureManager
         }
     }
 
+    /**
+     * 返回触摸帮助类
+     *
+     * @return
+     */
     public FTouchHelper getTouchHelper()
     {
         return mTouchHelper;
@@ -167,14 +168,15 @@ public class FGestureManager
      * 是否是点击事件
      *
      * @param event
+     * @param context
      * @return
      */
-    public boolean isClick(MotionEvent event)
+    public boolean isClick(MotionEvent event, Context context)
     {
         if (event.getAction() == MotionEvent.ACTION_UP)
         {
             final long clickTimeout = ViewConfiguration.getPressedStateDuration() + ViewConfiguration.getTapTimeout();
-            final int touchSlop = ViewConfiguration.get(mContext).getScaledTouchSlop();
+            final int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
             final long duration = event.getEventTime() - event.getDownTime();
             final int dx = (int) getTouchHelper().getDeltaXFrom(FTagTouchHelper.EVENT_DOWN);
