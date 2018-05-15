@@ -88,6 +88,16 @@ public class FGestureManager
     }
 
     /**
+     * 当前是否处于消费中
+     *
+     * @return
+     */
+    public boolean isTagConsume()
+    {
+        return mTouchHelper.isTagConsume();
+    }
+
+    /**
      * 是否是点击事件
      *
      * @param event
