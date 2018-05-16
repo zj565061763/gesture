@@ -278,67 +278,31 @@ public class FTouchHelper
         return getDeltaYFrom(event) > 0;
     }
 
-    /**
-     * 根据条件返回合法的x方向增量
-     *
-     * @param currentX 当前x
-     * @param minX     最小x
-     * @param maxX     最大x
-     * @param dx       x方向将要叠加的增量
-     * @return
-     */
-    public int getLegalDeltaX(int currentX, int minX, int maxX, int dx)
-    {
-        final int future = currentX + dx;
-        if (isMoveLeftFrom(EVENT_LAST))
-        {
-            //如果向左拖动
-            if (future < minX)
-            {
-                dx += (minX - future);
-            }
-        } else if (isMoveRightFrom(EVENT_LAST))
-        {
-            //如果向右拖动
-            if (future > maxX)
-            {
-                dx -= (future - maxX);
-            }
-        }
-        return dx;
-    }
-
-    /**
-     * 根据条件返回合法的y方向增量
-     *
-     * @param currentY 当前y
-     * @param minY     最小y
-     * @param maxY     最大y
-     * @param dy       y方向将要叠加的增量
-     * @return
-     */
-    public int getLegalDeltaY(int currentY, int minY, int maxY, int dy)
-    {
-        final int future = currentY + dy;
-        if (isMoveTopFrom(EVENT_LAST))
-        {
-            //如果向上拖动
-            if (future < minY)
-            {
-                dy += (minY - future);
-            }
-        } else if (isMoveBottomFrom(EVENT_LAST))
-        {
-            //如果向下拖动
-            if (future > maxY)
-            {
-                dy -= (future - maxY);
-            }
-        }
-        return dy;
-    }
-
     //----------static method start----------
+
+    /**
+     * 返回合理的增量
+     *
+     * @param current 当前值
+     * @param min     最小值
+     * @param max     最大值
+     * @param delta   增量
+     * @return
+     */
+    public static int getLegalDelta(int current, int min, int max, int delta)
+    {
+        if (delta == 0) return 0;
+
+        final int future = current + delta;
+        if (future < min)
+        {
+            delta += (min - future);
+        } else if (future > max)
+        {
+            delta += (max - future);
+        }
+        return delta;
+    }
 
     /**
      * 是否请求当前view的父view不要拦截事件
