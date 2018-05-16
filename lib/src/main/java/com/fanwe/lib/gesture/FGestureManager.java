@@ -138,11 +138,6 @@ public class FGestureManager
      */
     public boolean onInterceptTouchEvent(MotionEvent event)
     {
-        if (mTouchHelper.isTagIntercept())
-        {
-            return true;
-        }
-
         mTouchHelper.processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
@@ -156,12 +151,11 @@ public class FGestureManager
                 if (mCallback.shouldInterceptTouchEvent(event))
                 {
                     mTouchHelper.setTagIntercept(true);
-                    return true;
                 }
                 break;
         }
 
-        return false;
+        return mTouchHelper.isTagIntercept();
     }
 
     /**
