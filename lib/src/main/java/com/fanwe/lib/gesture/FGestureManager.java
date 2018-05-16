@@ -23,7 +23,7 @@ import android.view.ViewConfiguration;
 public class FGestureManager
 {
     private VelocityTracker mVelocityTracker;
-    private boolean mIsConsumedBeforeFinish;
+    private boolean mHasConsumeEvent;
     private final FTagTouchHelper mTouchHelper = new FTagTouchHelper()
     {
         @Override
@@ -82,9 +82,9 @@ public class FGestureManager
      *
      * @return
      */
-    public boolean isConsumedBeforeFinish()
+    public boolean hasConsumeEvent()
     {
-        return mIsConsumedBeforeFinish;
+        return mHasConsumeEvent;
     }
 
     /**
@@ -127,7 +127,7 @@ public class FGestureManager
     private void reset()
     {
         releaseVelocityTracker();
-        mIsConsumedBeforeFinish = false;
+        mHasConsumeEvent = false;
     }
 
     /**
@@ -192,7 +192,7 @@ public class FGestureManager
 
                     if (consume)
                     {
-                        mIsConsumedBeforeFinish = true;
+                        mHasConsumeEvent = true;
                     }
                 } else
                 {
