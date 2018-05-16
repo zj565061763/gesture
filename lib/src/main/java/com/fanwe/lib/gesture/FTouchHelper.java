@@ -312,12 +312,41 @@ public class FTouchHelper
      */
     public static void requestDisallowInterceptTouchEvent(View view, boolean disallowIntercept)
     {
-        ViewParent parent = view.getParent();
-        if (parent == null)
+        final ViewParent parent = view.getParent();
+        if (parent != null)
         {
-            return;
+            parent.requestDisallowInterceptTouchEvent(disallowIntercept);
         }
-        parent.requestDisallowInterceptTouchEvent(disallowIntercept);
+    }
+
+    /**
+     * view是否处于某个坐标点下面，相对父布局的坐标
+     *
+     * @param view
+     * @param x
+     * @param y
+     * @return
+     */
+    public static boolean isViewUnder(View view, int x, int y)
+    {
+        return x >= view.getLeft() && x < view.getRight()
+                && y >= view.getTop() && y < view.getBottom();
+    }
+
+    /**
+     * view是否处于某个坐标点下面，相对屏幕的坐标
+     *
+     * @param view
+     * @param x
+     * @param y
+     * @return
+     */
+    public static boolean isViewUnderScreen(View view, int x, int y)
+    {
+        final int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        return x >= location[0] && x < location[0] + view.getWidth()
+                && y >= location[1] && y < location[1] + view.getHeight();
     }
 
     /**
