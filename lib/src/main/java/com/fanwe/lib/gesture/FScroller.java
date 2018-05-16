@@ -169,7 +169,6 @@ public class FScroller
     public boolean computeScrollOffset()
     {
         final boolean compute = mScroller.computeScrollOffset();
-        updateFinished();
 
         final int currX = mScroller.getCurrX();
         final int currY = mScroller.getCurrY();
@@ -188,6 +187,7 @@ public class FScroller
             }
         }
 
+        updateFinished();
         return compute;
     }
 
