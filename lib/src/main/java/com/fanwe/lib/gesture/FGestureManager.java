@@ -20,11 +20,14 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.widget.Scroller;
 
+import com.fanwe.lib.gesture.tag.FTagHolder;
+import com.fanwe.lib.gesture.tag.TagHolder;
+
 public class FGestureManager
 {
     private final Context mContext;
 
-    private final FTouchHelper mTouchHelper;
+    private final FTouchHelper mTouchHelper = new FTouchHelper();
     private final FTagHolder mTagHolder;
     private FScroller mScroller;
 
@@ -41,7 +44,6 @@ public class FGestureManager
         mCallback = callback;
         mContext = context.getApplicationContext();
 
-        mTouchHelper = new FTouchHelper();
         mTagHolder = new FTagHolder()
         {
             @Override
@@ -61,6 +63,16 @@ public class FGestureManager
     public FTouchHelper getTouchHelper()
     {
         return mTouchHelper;
+    }
+
+    /**
+     * 返回标识持有者
+     *
+     * @return
+     */
+    public TagHolder getTagHolder()
+    {
+        return mTagHolder;
     }
 
     /**

@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.fanwe.lib.gesture;
+package com.fanwe.lib.gesture.tag;
 
-public class FTagHolder
+public class FTagHolder implements TagHolder
 {
     /**
      * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
@@ -28,31 +28,19 @@ public class FTagHolder
 
     private Callback mCallback;
 
-    /**
-     * 设置回调
-     *
-     * @param callback
-     */
+    @Override
     public final void setCallback(Callback callback)
     {
         mCallback = callback;
     }
 
-    /**
-     * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
-     *
-     * @return
-     */
+    @Override
     public final boolean isTagIntercept()
     {
         return mTagIntercept;
     }
 
-    /**
-     * 是否需要消费事件标识(用于onTouchEvent方法)
-     *
-     * @return
-     */
+    @Override
     public final boolean isTagConsume()
     {
         return mTagConsume;
@@ -103,12 +91,5 @@ public class FTagHolder
 
     protected void onTagConsumeChanged(boolean tag)
     {
-    }
-
-    public interface Callback
-    {
-        void onTagInterceptChanged(boolean tag);
-
-        void onTagConsumeChanged(boolean tag);
     }
 }
