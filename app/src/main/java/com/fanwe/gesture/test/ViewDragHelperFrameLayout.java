@@ -43,10 +43,42 @@ public class ViewDragHelperFrameLayout extends FrameLayout
             }
 
             @Override
+            public int clampViewPositionHorizontal(View child, int left, int dx)
+            {
+                final int min = getPaddingLeft();
+                final int max = getWidth() - getPaddingRight() - child.getWidth();
+                return Math.min(Math.max(left, min), max);
+            }
+
+            @Override
+            public int clampViewPositionVertical(View child, int top, int dy)
+            {
+                final int min = getPaddingTop();
+                final int max = getHeight() - getPaddingBottom() - child.getHeight();
+                return Math.min(Math.max(top, min), max);
+            }
+
+            @Override
+            public void onViewCaptured(View capturedChild, int activePointerId)
+            {
+                super.onViewCaptured(capturedChild, activePointerId);
+                Log.i(TAG, "onViewCaptured");
+            }
+
+            @Override
+            public void onViewReleased(View releasedChild, float xvel, float yvel)
+            {
+                super.onViewReleased(releasedChild, xvel, yvel);
+                Log.i(TAG, "onViewReleased:" + xvel + " " + yvel);
+                mViewDragHelper.settleCapturedViewAt(getPaddingLeft(), getPaddingTop());
+                invalidate();
+            }
+
+            @Override
             public void onViewDragStateChanged(int state)
             {
                 super.onViewDragStateChanged(state);
-                Log.i(TAG, "onViewDragStateChanged:" + state);
+                Log.e(TAG, "onViewDragStateChanged:" + state);
             }
         });
     }
@@ -54,15 +86,14 @@ public class ViewDragHelperFrameLayout extends FrameLayout
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev)
     {
-        mViewDragHelper.processTouchEvent(ev);
-        return true;
+        return mViewDragHelper.shouldInterceptTouchEvent(ev);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
         mViewDragHelper.processTouchEvent(event);
-        return true;
+        return mViewDragHelper.getCapturedView() != null;
     }
 
     @Override
