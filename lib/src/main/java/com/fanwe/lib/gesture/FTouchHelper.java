@@ -400,6 +400,34 @@ public class FTouchHelper
         return null;
     }
 
+    public static int getLeftAlignParentLeft(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getPaddingLeft();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align += ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).leftMargin;
+        }
+        return align;
+    }
+
+    public static int getLeftAlignParentRight(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getWidth() - parent.getPaddingRight() - child.getWidth();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align -= ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).rightMargin;
+        }
+        return align;
+    }
+
+    public static int getLeftAlignParentCenter(ViewGroup parent, View child, boolean margin)
+    {
+        final int alignLeft = getLeftAlignParentLeft(parent, child, margin);
+        final int alignRight = getLeftAlignParentRight(parent, child, margin);
+        final int align = (alignLeft + alignRight) / 2;
+        return align;
+    }
+
     /**
      * view是否已经滚动到最左边
      *

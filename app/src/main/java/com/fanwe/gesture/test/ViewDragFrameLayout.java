@@ -113,29 +113,23 @@ public class ViewDragFrameLayout extends FrameLayout
         return mGestureManager;
     }
 
-    private int getLeftAlignParentLeft(View view)
+    private void offsetLeftAndRightLegal(View view, int delta)
     {
-        return getPaddingLeft();
-    }
-
-    private int getLeftAlignParentRight(View view)
-    {
-        return getWidth() - getPaddingRight() - view.getWidth();
-    }
-
-    private int getLeftAlignParentCenter(View view)
-    {
-        return (getLeftAlignParentRight(view) + getLeftAlignParentLeft(view)) / 2;
+        delta = FTouchHelper.getLegalDelta(view.getLeft(),
+                FTouchHelper.getLeftAlignParentLeft(this, view, true),
+                FTouchHelper.getLeftAlignParentRight(this, view, true),
+                delta);
+        ViewCompat.offsetLeftAndRight(view, delta);
     }
 
     private void doScroll()
     {
         final int startX = mChild.getLeft();
 
-        int endX = getLeftAlignParentLeft(mChild);
-        if (startX >= getLeftAlignParentCenter(mChild))
+        int endX = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
+        if (startX >= FTouchHelper.getLeftAlignParentCenter(this, mChild, true))
         {
-            endX = getLeftAlignParentRight(mChild);
+            endX = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
         }
 
         final boolean scroll = getScroller().scrollToX(startX, endX, -1);
@@ -151,8 +145,8 @@ public class ViewDragFrameLayout extends FrameLayout
 
         final int startX = mChild.getLeft();
         final int velocityX = (int) velocityTracker.getXVelocity();
-        final int minX = getLeftAlignParentLeft(mChild);
-        final int maxX = getLeftAlignParentRight(mChild);
+        final int minX = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
+        final int maxX = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
 
         final boolean fling = getScroller().flingX(startX, velocityX, minX, maxX);
         if (fling)
