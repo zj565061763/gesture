@@ -47,13 +47,17 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public void onScrollStateChanged(boolean isFinished)
                 {
-
+                    if (isFinished)
+                    {
+                        mChild = null;
+                    }
                 }
 
                 @Override
                 public void onScroll(int dx, int dy)
                 {
-
+                    ViewCompat.offsetLeftAndRight(mChild, dx);
+                    ViewCompat.offsetTopAndBottom(mChild, dy);
                 }
             });
         }
@@ -95,7 +99,19 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public void onEventFinish(MotionEvent event, boolean hasConsumeEvent, VelocityTracker velocityTracker)
                 {
+                    if (mChild != null)
+                    {
+                        final int startX = mChild.getLeft();
+                        final int startY = mChild.getTop();
+                        final int endX = getPaddingLeft();
+                        final int endY = getPaddingTop();
 
+                        final boolean isScroll = getScroller().scrollTo(startX, startY, endX, endY, -1);
+                        if (isScroll)
+                        {
+                            invalidate();
+                        }
+                    }
                 }
             });
         }
@@ -122,5 +138,12 @@ public class ViewDragFrameLayout extends FrameLayout
         {
             invalidate();
         }
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom)
+    {
+        super.onLayout(changed, left, top, right, bottom);
+        getScroller().setMaxScrollDistance(getHeight());
     }
 }
