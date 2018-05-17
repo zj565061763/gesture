@@ -201,6 +201,7 @@ public class FScroller
         {
             if (dx != 0 || dy != 0)
             {
+                onScroll(dx, dy);
                 if (mCallback != null) mCallback.onScroll(dx, dy);
             }
         }
@@ -239,6 +240,15 @@ public class FScroller
     {
     }
 
+    /**
+     * 调用{@link FScroller#computeScrollOffset()}后触发
+     *
+     * @param dx x移动的距离
+     * @param dy y移动的距离
+     */
+    protected void onScroll(int dx, int dy)
+    {
+    }
 
     /**
      * 计算时长
