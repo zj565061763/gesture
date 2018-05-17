@@ -69,10 +69,13 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public void onScroll(int currX, int currY, int lastX, int lastY)
                 {
-                    offsetLeftAndRightLegal(mChild, currX - lastX);
-                    offsetTopAndBottomLegal(mChild, currY - lastY);
+                    final int dx = currX - lastX;
+                    final int dy = currY - lastY;
 
-                    Log.i(TAG, "onScroll:" + mChild.getLeft() + "," + mChild.getTop());
+                    offsetLeftAndRightLegal(mChild, dx);
+                    offsetTopAndBottomLegal(mChild, dy);
+
+                    Log.i(TAG, "onScroll:" + dx + "," + dy);
                 }
             });
         }
@@ -195,11 +198,18 @@ public class ViewDragFrameLayout extends FrameLayout
         velocityTracker.computeCurrentVelocity(1000);
 
         final int startX = mChild.getLeft();
+        final int startY = mChild.getTop();
+
         final int velocityX = (int) velocityTracker.getXVelocity();
+        final int velocityY = (int) velocityTracker.getYVelocity();
+
         final int minX = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
         final int maxX = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
 
-        final boolean fling = getScroller().flingX(startX, velocityX, minX, maxX);
+        final int minY = FTouchHelper.getTopAlignParentTop(this, mChild, true);
+        final int maxY = FTouchHelper.getTopAlignParentBottom(this, mChild, true);
+
+        final boolean fling = getScroller().fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
         if (fling)
         {
             invalidate();
