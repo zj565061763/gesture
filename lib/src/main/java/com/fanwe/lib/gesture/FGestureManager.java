@@ -22,24 +22,10 @@ import android.view.ViewConfiguration;
 
 public class FGestureManager
 {
+    private FTouchHelper mTouchHelper;
     private VelocityTracker mVelocityTracker;
+    private FTagHolder mTagHolder;
     private boolean mHasConsumeEvent;
-    private final FTagTouchHelper mTouchHelper = new FTagTouchHelper()
-    {
-        @Override
-        protected void onTagInterceptChanged(boolean tagIntercept)
-        {
-            super.onTagInterceptChanged(tagIntercept);
-            mCallback.onTagInterceptChanged(tagIntercept);
-        }
-
-        @Override
-        protected void onTagConsumeChanged(boolean tagConsume)
-        {
-            super.onTagConsumeChanged(tagConsume);
-            mCallback.onTagConsumeChanged(tagConsume);
-        }
-    };
 
     private final Callback mCallback;
 
@@ -47,6 +33,20 @@ public class FGestureManager
     {
         if (callback == null) throw new NullPointerException("callback is null");
         mCallback = callback;
+    }
+
+    /**
+     * 返回触摸帮助类
+     *
+     * @return
+     */
+    public FTouchHelper getTouchHelper()
+    {
+        if (mTouchHelper == null)
+        {
+            mTouchHelper = new FTouchHelper();
+        }
+        return mTouchHelper;
     }
 
     private VelocityTracker getVelocityTracker()
@@ -68,16 +68,6 @@ public class FGestureManager
     }
 
     /**
-     * 返回触摸帮助类
-     *
-     * @return
-     */
-    public FTouchHelper getTouchHelper()
-    {
-        return mTouchHelper;
-    }
-
-    /**
      * 一次完整的按下到离开的触摸过程中，是否有消费过事件
      *
      * @return
@@ -94,7 +84,7 @@ public class FGestureManager
      */
     public boolean isTagConsume()
     {
-        return mTouchHelper.isTagConsume();
+        return getTagHolder().isTagConsume();
     }
 
     /**
@@ -112,8 +102,8 @@ public class FGestureManager
             final int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
             final long duration = event.getEventTime() - event.getDownTime();
-            final int dx = (int) getTouchHelper().getDeltaXFrom(FTagTouchHelper.EVENT_DOWN);
-            final int dy = (int) getTouchHelper().getDeltaYFrom(FTagTouchHelper.EVENT_DOWN);
+            final int dx = (int) getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
+            final int dy = (int) getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
 
             if (duration < clickTimeout && dx < touchSlop && dy < touchSlop)
             {
@@ -124,8 +114,31 @@ public class FGestureManager
         return false;
     }
 
+    private FTagHolder getTagHolder()
+    {
+        if (mTagHolder == null)
+        {
+            mTagHolder = new FTagHolder()
+            {
+                @Override
+                protected void onTagInterceptChanged(boolean tagIntercept)
+                {
+                    mCallback.onTagInterceptChanged(tagIntercept);
+                }
+
+                @Override
+                protected void onTagConsumeChanged(boolean tagConsume)
+                {
+                    mCallback.onTagConsumeChanged(tagConsume);
+                }
+            };
+        }
+        return mTagHolder;
+    }
+
     private void reset()
     {
+        getTagHolder().reset();
         releaseVelocityTracker();
         mHasConsumeEvent = false;
     }
@@ -138,7 +151,7 @@ public class FGestureManager
      */
     public boolean onInterceptTouchEvent(MotionEvent event)
     {
-        mTouchHelper.processTouchEvent(event);
+        getTouchHelper().processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
         switch (event.getAction())
@@ -150,12 +163,12 @@ public class FGestureManager
             default:
                 if (mCallback.shouldInterceptTouchEvent(event))
                 {
-                    mTouchHelper.setTagIntercept(true);
+                    getTagHolder().setTagIntercept(true);
                 }
                 break;
         }
 
-        return mTouchHelper.isTagIntercept();
+        return getTagHolder().isTagIntercept();
     }
 
     /**
@@ -166,7 +179,7 @@ public class FGestureManager
      */
     public boolean onTouchEvent(MotionEvent event)
     {
-        mTouchHelper.processTouchEvent(event);
+        getTouchHelper().processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
         switch (event.getAction())
@@ -179,10 +192,10 @@ public class FGestureManager
                 reset();
                 break;
             default:
-                if (mTouchHelper.isTagConsume())
+                if (getTagHolder().isTagConsume())
                 {
                     final boolean consume = mCallback.onConsumeEvent(event);
-                    mTouchHelper.setTagConsume(consume);
+                    getTagHolder().setTagConsume(consume);
 
                     if (consume)
                     {
@@ -191,12 +204,12 @@ public class FGestureManager
                 } else
                 {
                     final boolean shouldConsume = mCallback.shouldConsumeTouchEvent(event);
-                    mTouchHelper.setTagConsume(shouldConsume);
+                    getTagHolder().setTagConsume(shouldConsume);
                 }
                 break;
         }
 
-        return mTouchHelper.isTagConsume();
+        return getTagHolder().isTagConsume();
     }
 
     public abstract static class Callback

@@ -15,12 +15,7 @@
  */
 package com.fanwe.lib.gesture;
 
-import android.view.MotionEvent;
-
-/**
- * 触摸事件处理帮助类<br>
- */
-public class FTagTouchHelper extends FTouchHelper
+public abstract class FTagHolder
 {
     /**
      * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
@@ -31,26 +26,10 @@ public class FTagTouchHelper extends FTouchHelper
      */
     private boolean mTagConsume = false;
 
-    @Override
-    public void processTouchEvent(MotionEvent ev)
-    {
-        super.processTouchEvent(ev);
-
-        switch (ev.getAction())
-        {
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                resetTag();
-                break;
-            default:
-                break;
-        }
-    }
-
     /**
      * 重置tag
      */
-    public final void resetTag()
+    public final void reset()
     {
         setTagIntercept(false);
         setTagConsume(false);
@@ -104,11 +83,7 @@ public class FTagTouchHelper extends FTouchHelper
         return mTagConsume;
     }
 
-    protected void onTagInterceptChanged(boolean tagIntercept)
-    {
-    }
+    protected abstract void onTagInterceptChanged(boolean tagIntercept);
 
-    protected void onTagConsumeChanged(boolean tagConsume)
-    {
-    }
+    protected abstract void onTagConsumeChanged(boolean tagConsume);
 }
