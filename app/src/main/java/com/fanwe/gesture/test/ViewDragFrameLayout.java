@@ -3,6 +3,7 @@ package com.fanwe.gesture.test;
 import android.content.Context;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -47,6 +48,8 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public void onScrollStateChanged(boolean isFinished)
                 {
+                    Log.e(TAG, "onScrollStateChanged isFinished:" + isFinished);
+
                     if (isFinished)
                     {
                         mChild = null;
@@ -58,6 +61,8 @@ public class ViewDragFrameLayout extends FrameLayout
                 {
                     ViewCompat.offsetLeftAndRight(mChild, dx);
                     ViewCompat.offsetTopAndBottom(mChild, dy);
+
+                    Log.i(TAG, "onScroll:" + mChild.getLeft() + "," + mChild.getTop());
                 }
             });
         }
@@ -73,9 +78,8 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public boolean onEventActionDown(MotionEvent event)
                 {
-                    final View child = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
-                    if (child != null) mChild = child;
-                    return child != null;
+                    mChild = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+                    return mChild != null;
                 }
 
                 @Override
@@ -99,7 +103,7 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public void onEventFinish(MotionEvent event, boolean hasConsumeEvent, VelocityTracker velocityTracker)
                 {
-                    if (mChild != null)
+                    if (hasConsumeEvent)
                     {
                         final int startX = mChild.getLeft();
                         final int startY = mChild.getTop();

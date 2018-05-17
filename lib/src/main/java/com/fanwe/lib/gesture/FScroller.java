@@ -69,7 +69,7 @@ public class FScroller
     public final boolean isFinished()
     {
         /**
-         * 这里返回当前对象保存的属性
+         * 这里直接返回当前对象保存的属性
          * 如果返回{@link FScroller#isFinished()}方法的返回值，则在通知{@link Callback#onScroll(int, int)}方法的时候，调用是否结束方法有可能返回true
          */
         return mIsFinished;
@@ -221,13 +221,13 @@ public class FScroller
 
     private void updateFinished()
     {
-        final boolean isFinished = isFinished();
-        if (mIsFinished != isFinished)
+        final boolean finish = mScroller.isFinished();
+        if (mIsFinished != finish)
         {
-            mIsFinished = isFinished;
+            mIsFinished = finish;
 
-            onScrollStateChanged(isFinished);
-            if (mCallback != null) mCallback.onScrollStateChanged(isFinished);
+            onScrollStateChanged(finish);
+            if (mCallback != null) mCallback.onScrollStateChanged(finish);
         }
     }
 
