@@ -15,10 +15,8 @@
  */
 package com.fanwe.lib.gesture;
 
-import android.content.Context;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
-import android.widget.Scroller;
 
 import com.fanwe.lib.gesture.tag.FTagHolder;
 import com.fanwe.lib.gesture.tag.TagHolder;
@@ -26,39 +24,17 @@ import com.fanwe.lib.gesture.tag.TagHolder;
 public class FGestureManager
 {
     private final FTouchHelper mTouchHelper = new FTouchHelper();
-    private final FTagHolder mTagHolder;
-    private final FScroller mScroller;
-
-    private State mState = State.IDLE;
+    private final FTagHolder mTagHolder = new FTagHolder();
 
     private VelocityTracker mVelocityTracker;
     private boolean mHasConsumeEvent;
 
     private final Callback mCallback;
 
-    public FGestureManager(Context context, Callback callback)
+    public FGestureManager(Callback callback)
     {
         if (callback == null) throw new NullPointerException("callback is null");
         mCallback = callback;
-
-        mTagHolder = new FTagHolder()
-        {
-            @Override
-            protected void onTagConsumeChanged(boolean tag)
-            {
-                super.onTagConsumeChanged(tag);
-                updateStateIfNeed();
-            }
-        };
-        mScroller = new FScroller(new Scroller(context))
-        {
-            @Override
-            protected void onScrollStateChanged(boolean isFinished)
-            {
-                super.onScrollStateChanged(isFinished);
-                updateStateIfNeed();
-            }
-        };
     }
 
     /**
@@ -81,16 +57,6 @@ public class FGestureManager
         return mTagHolder;
     }
 
-    /**
-     * 返回滚动帮助类
-     *
-     * @return
-     */
-    public FScroller getScroller()
-    {
-        return mScroller;
-    }
-
     private VelocityTracker getVelocityTracker()
     {
         if (mVelocityTracker == null)
@@ -110,48 +76,6 @@ public class FGestureManager
     }
 
     /**
-     * 返回当前的状态
-     *
-     * @return {@link State}
-     */
-    public State getState()
-    {
-        return mState;
-    }
-
-    private void updateStateIfNeed()
-    {
-        if (mTagHolder.isTagConsume())
-        {
-            if (mScroller.isFinished())
-            {
-                setState(State.CONSUME);
-            } else
-            {
-                setState(State.CONSUME_FLING);
-            }
-        } else
-        {
-            if (mScroller.isFinished())
-            {
-                setState(State.IDLE);
-            } else
-            {
-                setState(State.FLING);
-            }
-        }
-    }
-
-    private void setState(State state)
-    {
-        if (mState != state)
-        {
-            mState = state;
-            mCallback.onStateChanged(state);
-        }
-    }
-
-    /**
      * 外部调用
      *
      * @param event
@@ -167,7 +91,6 @@ public class FGestureManager
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 mTagHolder.reset();
-                mHasConsumeEvent = false;
                 releaseVelocityTracker();
                 break;
             default:
@@ -200,10 +123,7 @@ public class FGestureManager
             case MotionEvent.ACTION_CANCEL:
                 mTagHolder.reset();
 
-                if (mHasConsumeEvent)
-                {
-                    mCallback.onConsumeEventFinish(event, getVelocityTracker());
-                }
+                if (mHasConsumeEvent) mCallback.onConsumeEventFinish(event, getVelocityTracker());
                 mCallback.onEventFinish(event);
 
                 mHasConsumeEvent = false;
@@ -215,11 +135,8 @@ public class FGestureManager
                     final boolean consume = mCallback.onConsumeEvent(event);
                     mTagHolder.setTagConsume(consume);
 
-                    if (consume)
-                    {
-                        // 标识消费过事件
-                        mHasConsumeEvent = true;
-                    }
+                    // 标识消费过事件
+                    if (consume) mHasConsumeEvent = true;
                 } else
                 {
                     mTagHolder.setTagConsume(mCallback.shouldConsumeEvent(event));
@@ -228,14 +145,6 @@ public class FGestureManager
         }
 
         return mTagHolder.isTagConsume();
-    }
-
-    public enum State
-    {
-        IDLE,
-        CONSUME,
-        CONSUME_FLING,
-        FLING
     }
 
     public abstract static class Callback
@@ -293,15 +202,6 @@ public class FGestureManager
          * @param event
          */
         public void onEventFinish(MotionEvent event)
-        {
-        }
-
-        /**
-         * 状态变化回调
-         *
-         * @param state {@link State}
-         */
-        public void onStateChanged(State state)
         {
         }
     }
