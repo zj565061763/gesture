@@ -119,13 +119,11 @@ public class FGestureManager
         switch (event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
-                return mCallback.onActionDown(event);
+                return mCallback.onEventActionDown(event);
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 mTagHolder.reset();
-
-                if (mHasConsumeEvent) mCallback.onConsumeEventFinish(event, getVelocityTracker());
-                mCallback.onEventFinish(event);
+                mCallback.onEventFinish(event, mHasConsumeEvent, getVelocityTracker());
 
                 mHasConsumeEvent = false;
                 releaseVelocityTracker();
@@ -133,7 +131,7 @@ public class FGestureManager
             default:
                 if (mTagHolder.isTagConsume())
                 {
-                    final boolean consume = mCallback.onConsumeEvent(event);
+                    final boolean consume = mCallback.onEventConsume(event);
                     mTagHolder.setTagConsume(consume);
 
                     // 标识消费过事件
@@ -169,7 +167,7 @@ public class FGestureManager
          * @param event
          * @return
          */
-        public boolean onActionDown(MotionEvent event)
+        public boolean onEventActionDown(MotionEvent event)
         {
             return true;
         }
@@ -188,23 +186,15 @@ public class FGestureManager
          * @param event
          * @return
          */
-        public abstract boolean onConsumeEvent(MotionEvent event);
-
-        /**
-         * 事件结束({@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL})，并且{@link #onConsumeEvent(MotionEvent)}方法消费过事件
-         *
-         * @param event
-         * @param velocityTracker
-         */
-        public abstract void onConsumeEventFinish(MotionEvent event, VelocityTracker velocityTracker);
+        public abstract boolean onEventConsume(MotionEvent event);
 
         /**
          * 事件结束({@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL})
          *
          * @param event
+         * @param hasConsumeEvent 本次按下到结束的过程中{@link #onEventConsume(MotionEvent)}方法是否消费过事件
+         * @param velocityTracker
          */
-        public void onEventFinish(MotionEvent event)
-        {
-        }
+        public abstract void onEventFinish(MotionEvent event, boolean hasConsumeEvent, VelocityTracker velocityTracker);
     }
 }
