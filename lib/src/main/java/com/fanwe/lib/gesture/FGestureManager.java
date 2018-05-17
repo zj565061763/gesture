@@ -91,6 +91,7 @@ public class FGestureManager
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 mTagHolder.reset();
+                mHasConsumeEvent = false;
                 releaseVelocityTracker();
                 break;
             default:
