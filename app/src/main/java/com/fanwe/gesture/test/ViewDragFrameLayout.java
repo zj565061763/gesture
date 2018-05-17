@@ -15,6 +15,8 @@ import com.fanwe.lib.gesture.FGestureManager;
 import com.fanwe.lib.gesture.FScroller;
 import com.fanwe.lib.gesture.FTouchHelper;
 
+import java.util.List;
+
 public class ViewDragFrameLayout extends FrameLayout
 {
     public ViewDragFrameLayout(Context context)
@@ -93,7 +95,7 @@ public class ViewDragFrameLayout extends FrameLayout
                 {
                     if (event.getAction() == MotionEvent.ACTION_DOWN)
                     {
-                        final View child = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+                        final View child = findMaxTopChild(event);
                         setChild(child);
                         return false;
                     } else
@@ -119,7 +121,7 @@ public class ViewDragFrameLayout extends FrameLayout
                 {
                     if (mChild == null)
                     {
-                        final View child = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+                        final View child = findMaxTopChild(event);
                         setChild(child);
                     }
                     return mChild != null;
@@ -157,6 +159,27 @@ public class ViewDragFrameLayout extends FrameLayout
             });
         }
         return mGestureManager;
+    }
+
+    private View findMaxTopChild(MotionEvent event)
+    {
+        final List<View> list = FTouchHelper.findChildrenUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+
+        View maxZ = null;
+        for (View item : list)
+        {
+            if (maxZ == null)
+            {
+                maxZ = item;
+            } else
+            {
+                if (ViewCompat.getZ(item) > ViewCompat.getZ(maxZ))
+                {
+                    maxZ = item;
+                }
+            }
+        }
+        return maxZ;
     }
 
     private void offsetLeftAndRightLegal(View view, int delta)

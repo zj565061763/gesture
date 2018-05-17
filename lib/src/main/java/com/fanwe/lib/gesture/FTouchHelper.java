@@ -23,6 +23,9 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 触摸事件处理帮助类<br>
  */
@@ -386,20 +389,30 @@ public class FTouchHelper
      * @param y
      * @return
      */
-    public static View findTopChildUnder(ViewGroup parent, int x, int y)
+    public static List<View> findChildrenUnder(ViewGroup parent, int x, int y)
     {
+        final List<View> list = new ArrayList<>(2);
+
         final int count = parent.getChildCount();
         for (int i = count - 1; i >= 0; i--)
         {
             final View child = parent.getChildAt(i);
             if (isViewUnder(child, x, y))
             {
-                return child;
+                list.add(child);
             }
         }
-        return null;
+        return list;
     }
 
+    /**
+     * 返回child和parent左边对齐时候，child的left
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
     public static int getLeftAlignParentLeft(ViewGroup parent, View child, boolean margin)
     {
         int align = parent.getPaddingLeft();
@@ -410,6 +423,14 @@ public class FTouchHelper
         return align;
     }
 
+    /**
+     * 返回child和parent右边对齐时候，child的left
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
     public static int getLeftAlignParentRight(ViewGroup parent, View child, boolean margin)
     {
         int align = parent.getWidth() - parent.getPaddingRight() - child.getWidth();
@@ -420,6 +441,14 @@ public class FTouchHelper
         return align;
     }
 
+    /**
+     * 返回child和parent顶部对齐时候，child的top
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
     public static int getTopAlignParentTop(ViewGroup parent, View child, boolean margin)
     {
         int align = parent.getPaddingTop();
@@ -430,6 +459,14 @@ public class FTouchHelper
         return align;
     }
 
+    /**
+     * 返回child和parent底部对齐时候，child的top
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
     public static int getTopAlignParentBottom(ViewGroup parent, View child, boolean margin)
     {
         int align = parent.getHeight() - parent.getPaddingTop() - child.getHeight();
