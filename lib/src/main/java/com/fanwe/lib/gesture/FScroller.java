@@ -165,6 +165,11 @@ public class FScroller
         return scroll;
     }
 
+    public boolean flingX(int startX, int velocityX, int minX, int maxX)
+    {
+        return fling(startX, 0, velocityX, 0, minX, maxX, 0, 0);
+    }
+
     public boolean fling(int startX, int startY,
                          int velocityX, int velocityY,
                          int minX, int maxX,
