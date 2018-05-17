@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.fanwe.lib.gesture;
+package com.fanwe.lib.gesture.tag;
 
-public abstract class FTagHolder
+public class FTagHolder implements TagHolder
 {
     /**
      * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
@@ -26,13 +26,24 @@ public abstract class FTagHolder
      */
     private boolean mTagConsume = false;
 
-    /**
-     * 重置tag
-     */
-    public final void reset()
+    private Callback mCallback;
+
+    @Override
+    public final void setCallback(Callback callback)
     {
-        setTagIntercept(false);
-        setTagConsume(false);
+        mCallback = callback;
+    }
+
+    @Override
+    public final boolean isTagIntercept()
+    {
+        return mTagIntercept;
+    }
+
+    @Override
+    public final boolean isTagConsume()
+    {
+        return mTagConsume;
     }
 
     /**
@@ -45,18 +56,8 @@ public abstract class FTagHolder
         if (mTagIntercept != tagIntercept)
         {
             mTagIntercept = tagIntercept;
-            onTagInterceptChanged(tagIntercept);
+            if (mCallback != null) mCallback.onTagInterceptChanged(tagIntercept);
         }
-    }
-
-    /**
-     * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
-     *
-     * @return
-     */
-    public final boolean isTagIntercept()
-    {
-        return mTagIntercept;
     }
 
     /**
@@ -69,21 +70,16 @@ public abstract class FTagHolder
         if (mTagConsume != tagConsume)
         {
             mTagConsume = tagConsume;
-            onTagConsumeChanged(tagConsume);
+            if (mCallback != null) mCallback.onTagConsumeChanged(tagConsume);
         }
     }
 
     /**
-     * 是否需要消费事件标识(用于onTouchEvent方法)
-     *
-     * @return
+     * 重置tag
      */
-    public final boolean isTagConsume()
+    public final void reset()
     {
-        return mTagConsume;
+        setTagIntercept(false);
+        setTagConsume(false);
     }
-
-    protected abstract void onTagInterceptChanged(boolean tagIntercept);
-
-    protected abstract void onTagConsumeChanged(boolean tagConsume);
 }
