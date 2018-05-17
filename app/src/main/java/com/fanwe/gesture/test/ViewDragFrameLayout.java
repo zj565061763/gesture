@@ -57,10 +57,10 @@ public class ViewDragFrameLayout extends FrameLayout
                 }
 
                 @Override
-                public void onScroll(int dx, int dy)
+                public void onScroll(int currX, int currY, int lastX, int lastY)
                 {
-                    ViewCompat.offsetLeftAndRight(mChild, dx);
-                    ViewCompat.offsetTopAndBottom(mChild, dy);
+                    ViewCompat.offsetLeftAndRight(mChild, currX - lastX);
+                    ViewCompat.offsetTopAndBottom(mChild, currY - lastY);
 
                     Log.i(TAG, "onScroll:" + mChild.getLeft() + "," + mChild.getTop());
                 }

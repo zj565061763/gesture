@@ -186,6 +186,16 @@ public class FScroller
         return fling;
     }
 
+    public int getCurrX()
+    {
+        return mScroller.getCurrX();
+    }
+
+    public int getCurrY()
+    {
+        return mScroller.getCurrY();
+    }
+
     /**
      * 返回根据滚动距离和滚动速度算出的滚动时长
      *
@@ -210,20 +220,17 @@ public class FScroller
         final int currX = mScroller.getCurrX();
         final int currY = mScroller.getCurrY();
 
-        final int dx = currX - mLastX;
-        final int dy = currY - mLastY;
+        if (compute)
+        {
+            if (currX != mLastX || currY != mLastY)
+            {
+                onScroll(currX, currY, mLastX, mLastY);
+                if (mCallback != null) mCallback.onScroll(currX, currY, mLastX, mLastY);
+            }
+        }
 
         mLastX = currX;
         mLastY = currY;
-
-        if (compute)
-        {
-            if (dx != 0 || dy != 0)
-            {
-                onScroll(dx, dy);
-                if (mCallback != null) mCallback.onScroll(dx, dy);
-            }
-        }
 
         updateFinished();
         return compute;
@@ -262,10 +269,12 @@ public class FScroller
     /**
      * 调用{@link FScroller#computeScrollOffset()}后触发
      *
-     * @param dx x移动的距离
-     * @param dy y移动的距离
+     * @param currX 当前x
+     * @param currY 当前y
+     * @param lastX 上一次的x
+     * @param lastY 上一次的y
      */
-    protected void onScroll(int dx, int dy)
+    protected void onScroll(int currX, int currY, int lastX, int lastY)
     {
     }
 
@@ -305,9 +314,11 @@ public class FScroller
         /**
          * 调用{@link FScroller#computeScrollOffset()}后触发
          *
-         * @param dx x移动的距离
-         * @param dy y移动的距离
+         * @param currX 当前x
+         * @param currY 当前y
+         * @param lastX 上一次的x
+         * @param lastY 上一次的y
          */
-        void onScroll(int dx, int dy);
+        void onScroll(int currX, int currY, int lastX, int lastY);
     }
 }
