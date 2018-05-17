@@ -156,7 +156,7 @@ public class FScroller
 
             if (duration < 0)
             {
-                duration = getDuration(dx, dy);
+                duration = computeDuration(dx, dy, mMaxScrollDistance, mMaxScrollDuration, mMinScrollDuration);
             }
 
             mScroller.startScroll(startX, startY, dx, dy, duration);
@@ -192,18 +192,6 @@ public class FScroller
             updateFinished();
         }
         return fling;
-    }
-
-    /**
-     * 返回根据滚动距离和滚动速度算出的滚动时长
-     *
-     * @param dx x滚动距离
-     * @param dy y滚动距离
-     * @return
-     */
-    public final int getDuration(int dx, int dy)
-    {
-        return computeDuration(dx, dy, mMaxScrollDistance, mMaxScrollDuration, mMinScrollDuration);
     }
 
     /**
@@ -289,10 +277,7 @@ public class FScroller
     public static int computeDuration(int dx, int dy, int maxDistance, int maxDuration, int minDuration)
     {
         maxDistance = Math.abs(maxDistance);
-        if (maxDistance == 0)
-        {
-            return minDuration;
-        }
+        if (maxDistance == 0) return minDuration;
 
         final float distance = (float) Math.sqrt(Math.abs(dx * dx) + Math.abs(dy * dy));
         final float disPercent = distance / maxDistance;
