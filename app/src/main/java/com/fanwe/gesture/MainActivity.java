@@ -19,8 +19,8 @@ public class MainActivity extends AppCompatActivity
         startActivity(new Intent(this, TestEventActivity.class));
     }
 
-    public void onClickTestViewDragHelperActivity(View view)
+    public void onClickTestViewDragActivity(View view)
     {
-        startActivity(new Intent(this, TestViewDragHelperActivity.class));
+        startActivity(new Intent(this, TestViewDragActivity.class));
     }
 }

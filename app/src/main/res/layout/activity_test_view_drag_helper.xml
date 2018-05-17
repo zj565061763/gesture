@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.fanwe.gesture.test.ViewDragHelperFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.fanwe.gesture.test.ViewDragFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -15,4 +15,4 @@
         android:layout_height="wrap_content"
         android:text="TextView" />
 
-</com.fanwe.gesture.test.ViewDragHelperFrameLayout>
+</com.fanwe.gesture.test.ViewDragFrameLayout>

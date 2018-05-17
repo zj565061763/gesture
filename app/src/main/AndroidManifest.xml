@@ -18,7 +18,7 @@
         </activity>
 
         <activity android:name=".TestEventActivity" />
-        <activity android:name=".TestViewDragHelperActivity" />
+        <activity android:name=".TestViewDragActivity" />
 
     </application>
 

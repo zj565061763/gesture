@@ -8,27 +8,27 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 
-public class ViewDragHelperFrameLayout extends FrameLayout
+public class ViewDragFrameLayout extends FrameLayout
 {
-    public ViewDragHelperFrameLayout(Context context)
+    public ViewDragFrameLayout(Context context)
     {
         super(context);
         init();
     }
 
-    public ViewDragHelperFrameLayout(Context context, AttributeSet attrs)
+    public ViewDragFrameLayout(Context context, AttributeSet attrs)
     {
         super(context, attrs);
         init();
     }
 
-    public ViewDragHelperFrameLayout(Context context, AttributeSet attrs, int defStyleAttr)
+    public ViewDragFrameLayout(Context context, AttributeSet attrs, int defStyleAttr)
     {
         super(context, attrs, defStyleAttr);
         init();
     }
 
-    private static final String TAG = ViewDragHelperFrameLayout.class.getSimpleName();
+    private static final String TAG = ViewDragFrameLayout.class.getSimpleName();
 
     private ViewDragHelper mViewDragHelper;
 
