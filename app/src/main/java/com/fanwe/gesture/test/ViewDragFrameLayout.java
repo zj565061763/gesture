@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 import android.widget.Scroller;
 
@@ -38,6 +39,15 @@ public class ViewDragFrameLayout extends FrameLayout
 
     private View mChild;
 
+    private void setChild(View child)
+    {
+        if (mChild != child)
+        {
+            mChild = child;
+            Log.e(TAG, "setChild:" + child);
+        }
+    }
+
     private FScroller getScroller()
     {
         if (mScroller == null)
@@ -52,7 +62,7 @@ public class ViewDragFrameLayout extends FrameLayout
 
                     if (isFinished)
                     {
-                        mChild = null;
+                        setChild(null);
                     }
                 }
 
@@ -76,9 +86,38 @@ public class ViewDragFrameLayout extends FrameLayout
             mGestureManager = new FGestureManager(new FGestureManager.Callback()
             {
                 @Override
+                public boolean shouldInterceptEvent(MotionEvent event)
+                {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN)
+                    {
+                        final View child = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+                        setChild(child);
+                    }
+
+                    final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
+                    final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
+
+                    final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+
+                    if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
+                    {
+                        if (mChild != null)
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                @Override
                 public boolean onEventActionDown(MotionEvent event)
                 {
-                    mChild = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+                    if (mChild == null)
+                    {
+                        final View child = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+                        setChild(child);
+                    }
                     return mChild != null;
                 }
 
@@ -106,6 +145,9 @@ public class ViewDragFrameLayout extends FrameLayout
                     if (hasConsumeEvent)
                     {
                         doScroll();
+                    } else
+                    {
+                        setChild(null);
                     }
                 }
             });
