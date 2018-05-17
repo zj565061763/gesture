@@ -126,11 +126,10 @@ public class ViewDragFrameLayout extends FrameLayout
     {
         final int startX = mChild.getLeft();
 
-        int endX = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
-        if (startX >= FTouchHelper.getLeftAlignParentCenter(this, mChild, true))
-        {
-            endX = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
-        }
+        final int alignLeft = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
+        final int alignRight = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
+
+        final int endX = startX < (alignLeft + alignRight) / 2 ? alignLeft : alignRight;
 
         final boolean scroll = getScroller().scrollToX(startX, endX, -1);
         if (scroll)

@@ -420,14 +420,6 @@ public class FTouchHelper
         return align;
     }
 
-    public static int getLeftAlignParentCenter(ViewGroup parent, View child, boolean margin)
-    {
-        final int alignLeft = getLeftAlignParentLeft(parent, child, margin);
-        final int alignRight = getLeftAlignParentRight(parent, child, margin);
-        final int align = (alignLeft + alignRight) / 2;
-        return align;
-    }
-
     /**
      * view是否已经滚动到最左边
      *
