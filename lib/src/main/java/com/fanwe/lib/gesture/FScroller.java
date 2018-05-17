@@ -171,7 +171,7 @@ public class FScroller
                          int minY, int maxY)
     {
         final boolean fling = (startX > minX && startX < maxX && velocityX != 0)
-                || (startY > minY && startY < minY && velocityY != 0);
+                || (startY > minY && startY < maxY && velocityY != 0);
 
         if (fling)
         {
