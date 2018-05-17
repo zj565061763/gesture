@@ -235,7 +235,7 @@ public class FGestureManager
         }
 
         /**
-         * 是否需要消费按下事件，只有此方法返回true，才有后续的移动事件，默认返回true
+         * 是否需要消费按下事件，此方法返回true，才有后续的移动等事件，默认返回true
          *
          * @param event
          * @return
