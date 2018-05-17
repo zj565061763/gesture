@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.fanwe.lib.gesture.tag;
+package com.fanwe.lib.gesture;
 
-public class FTagHolder implements TagHolder
+public class FTagHolder
 {
     /**
      * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
@@ -28,19 +28,31 @@ public class FTagHolder implements TagHolder
 
     private Callback mCallback;
 
-    @Override
+    /**
+     * 设置回调
+     *
+     * @param callback
+     */
     public final void setCallback(Callback callback)
     {
         mCallback = callback;
     }
 
-    @Override
+    /**
+     * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
+     *
+     * @return
+     */
     public final boolean isTagIntercept()
     {
         return mTagIntercept;
     }
 
-    @Override
+    /**
+     * 是否需要消费事件标识(用于onTouchEvent方法)
+     *
+     * @return
+     */
     public final boolean isTagConsume()
     {
         return mTagConsume;
@@ -56,6 +68,7 @@ public class FTagHolder implements TagHolder
         if (mTagIntercept != tagIntercept)
         {
             mTagIntercept = tagIntercept;
+            onTagInterceptChanged(tagIntercept);
             if (mCallback != null) mCallback.onTagInterceptChanged(tagIntercept);
         }
     }
@@ -70,6 +83,7 @@ public class FTagHolder implements TagHolder
         if (mTagConsume != tagConsume)
         {
             mTagConsume = tagConsume;
+            onTagConsumeChanged(tagConsume);
             if (mCallback != null) mCallback.onTagConsumeChanged(tagConsume);
         }
     }
@@ -81,5 +95,20 @@ public class FTagHolder implements TagHolder
     {
         setTagIntercept(false);
         setTagConsume(false);
+    }
+
+    protected void onTagInterceptChanged(boolean tag)
+    {
+    }
+
+    protected void onTagConsumeChanged(boolean tag)
+    {
+    }
+
+    public interface Callback
+    {
+        void onTagInterceptChanged(boolean tag);
+
+        void onTagConsumeChanged(boolean tag);
     }
 }

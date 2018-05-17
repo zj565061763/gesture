@@ -15,9 +15,11 @@
  */
 package com.fanwe.lib.gesture;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewParent;
 
 /**
@@ -232,6 +234,32 @@ public class FTouchHelper
         final float dx = getDeltaXFrom(event);
         final float angle = Math.abs(dx) / Math.abs(dy);
         return Math.toDegrees(Math.atan(angle));
+    }
+
+    /**
+     * 是否是点击事件
+     *
+     * @param event
+     * @param context
+     * @return
+     */
+    public boolean isClick(MotionEvent event, Context context)
+    {
+        if (event.getAction() == MotionEvent.ACTION_UP)
+        {
+            final long clickTimeout = ViewConfiguration.getPressedStateDuration() + ViewConfiguration.getTapTimeout();
+            final int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+
+            final long duration = event.getEventTime() - event.getDownTime();
+            final int dx = (int) getDeltaXFrom(FTouchHelper.EVENT_DOWN);
+            final int dy = (int) getDeltaYFrom(FTouchHelper.EVENT_DOWN);
+
+            if (duration < clickTimeout && dx < touchSlop && dy < touchSlop)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -17,6 +17,9 @@ package com.fanwe.lib.gesture;
 
 import android.widget.Scroller;
 
+/**
+ * 滚动帮助类
+ */
 public class FScroller
 {
     private final Scroller mScroller;
