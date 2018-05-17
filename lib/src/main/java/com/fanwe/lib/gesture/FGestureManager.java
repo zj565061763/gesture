@@ -25,11 +25,9 @@ import com.fanwe.lib.gesture.tag.TagHolder;
 
 public class FGestureManager
 {
-    private final Context mContext;
-
     private final FTouchHelper mTouchHelper = new FTouchHelper();
     private final FTagHolder mTagHolder;
-    private FScroller mScroller;
+    private final FScroller mScroller;
 
     private State mState = State.IDLE;
 
@@ -42,7 +40,6 @@ public class FGestureManager
     {
         if (callback == null) throw new NullPointerException("callback is null");
         mCallback = callback;
-        mContext = context.getApplicationContext();
 
         mTagHolder = new FTagHolder()
         {
@@ -50,6 +47,15 @@ public class FGestureManager
             protected void onTagConsumeChanged(boolean tag)
             {
                 super.onTagConsumeChanged(tag);
+                updateStateIfNeed();
+            }
+        };
+        mScroller = new FScroller(new Scroller(context))
+        {
+            @Override
+            protected void onScrollStateChanged(boolean isFinished)
+            {
+                super.onScrollStateChanged(isFinished);
                 updateStateIfNeed();
             }
         };
@@ -82,18 +88,6 @@ public class FGestureManager
      */
     public FScroller getScroller()
     {
-        if (mScroller == null)
-        {
-            mScroller = new FScroller(new Scroller(mContext))
-            {
-                @Override
-                protected void onScrollStateChanged(boolean isFinished)
-                {
-                    super.onScrollStateChanged(isFinished);
-                    updateStateIfNeed();
-                }
-            };
-        }
         return mScroller;
     }
 
@@ -129,7 +123,7 @@ public class FGestureManager
     {
         if (mTagHolder.isTagConsume())
         {
-            if (getScroller().isFinished())
+            if (mScroller.isFinished())
             {
                 setState(State.CONSUME);
             } else
@@ -138,7 +132,7 @@ public class FGestureManager
             }
         } else
         {
-            if (getScroller().isFinished())
+            if (mScroller.isFinished())
             {
                 setState(State.IDLE);
             } else
@@ -157,13 +151,6 @@ public class FGestureManager
         }
     }
 
-    private void reset()
-    {
-        mTagHolder.reset();
-        mHasConsumeEvent = false;
-        releaseVelocityTracker();
-    }
-
     /**
      * 外部调用
      *
@@ -179,7 +166,9 @@ public class FGestureManager
         {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                reset();
+                mTagHolder.reset();
+                mHasConsumeEvent = false;
+                releaseVelocityTracker();
                 break;
             default:
                 if (mCallback.shouldInterceptEvent(event))
@@ -209,12 +198,16 @@ public class FGestureManager
                 return mCallback.consumeDownEvent();
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                mTagHolder.reset();
+
                 if (mHasConsumeEvent)
                 {
                     mCallback.onConsumeEventFinish(event, getVelocityTracker());
                 }
                 mCallback.onEventFinish(event);
-                reset();
+
+                mHasConsumeEvent = false;
+                releaseVelocityTracker();
                 break;
             default:
                 if (mTagHolder.isTagConsume())
