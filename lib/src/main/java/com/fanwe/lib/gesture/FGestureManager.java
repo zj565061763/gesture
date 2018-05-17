@@ -104,13 +104,6 @@ public class FGestureManager
         return false;
     }
 
-    private void reset()
-    {
-        mTagHolder.reset();
-        releaseVelocityTracker();
-        mHasConsumeEvent = false;
-    }
-
     /**
      * 外部调用
      *
@@ -126,7 +119,9 @@ public class FGestureManager
         {
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
-                reset();
+                mTagHolder.reset();
+                mHasConsumeEvent = false;
+                releaseVelocityTracker();
                 break;
             default:
                 if (mCallback.shouldInterceptEvent(event))
@@ -156,12 +151,16 @@ public class FGestureManager
                 return mCallback.consumeDownEvent();
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
+                mTagHolder.reset();
+
                 if (mHasConsumeEvent)
                 {
                     mCallback.onConsumeEventFinish(event, getVelocityTracker());
                 }
                 mCallback.onEventFinish(event);
-                reset();
+
+                mHasConsumeEvent = false;
+                releaseVelocityTracker();
                 break;
             default:
                 if (mTagHolder.isTagConsume())
