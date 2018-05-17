@@ -148,6 +148,7 @@ public class FScroller
     public final boolean scrollDelta(int startX, int startY, int dx, int dy, int duration)
     {
         final boolean scroll = dx != 0 || dy != 0;
+
         if (scroll)
         {
             mLastX = startX;
