@@ -171,6 +171,7 @@ public class FGestureManager
 
                     if (consume)
                     {
+                        // 标识消费过事件
                         mHasConsumeEvent = true;
                     }
                 } else
