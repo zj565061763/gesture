@@ -22,17 +22,13 @@ import android.widget.Scroller;
 
 public class FGestureManager
 {
-    public static final int STATE_IDLE = 0;
-    public static final int STATE_CONSUME = 1;
-    public static final int STATE_FLING = 2;
-
     private final Context mContext;
 
     private final FTouchHelper mTouchHelper;
     private final FTagHolder mTagHolder;
     private FScroller mScroller;
 
-    private int mState = STATE_IDLE;
+    private State mState = State.IDLE;
 
     private VelocityTracker mVelocityTracker;
     private boolean mHasConsumeEvent;
@@ -110,9 +106,9 @@ public class FGestureManager
     /**
      * 返回当前的状态
      *
-     * @return {@link #STATE_IDLE} {@link #STATE_CONSUME} {@link #STATE_FLING}
+     * @return {@link State}
      */
-    public int getState()
+    public State getState()
     {
         return mState;
     }
@@ -121,20 +117,26 @@ public class FGestureManager
     {
         if (mTagHolder.isTagConsume())
         {
-            setState(STATE_CONSUME);
+            if (getScroller().isFinished())
+            {
+                setState(State.CONSUME);
+            } else
+            {
+                setState(State.CONSUME_FLING);
+            }
         } else
         {
             if (getScroller().isFinished())
             {
-                setState(STATE_IDLE);
+                setState(State.IDLE);
             } else
             {
-                setState(STATE_FLING);
+                setState(State.FLING);
             }
         }
     }
 
-    private void setState(int state)
+    private void setState(State state)
     {
         if (mState != state)
         {
@@ -223,6 +225,14 @@ public class FGestureManager
         return mTagHolder.isTagConsume();
     }
 
+    public enum State
+    {
+        IDLE,
+        CONSUME,
+        CONSUME_FLING,
+        FLING
+    }
+
     public abstract static class Callback
     {
         /**
@@ -284,9 +294,9 @@ public class FGestureManager
         /**
          * 状态变化回调
          *
-         * @param state {@link #STATE_IDLE} {@link #STATE_CONSUME} {@link #STATE_FLING}
+         * @param state {@link State}
          */
-        public void onStateChanged(int state)
+        public void onStateChanged(State state)
         {
         }
     }
