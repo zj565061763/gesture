@@ -113,14 +113,32 @@ public class ViewDragFrameLayout extends FrameLayout
         return mGestureManager;
     }
 
+    private int getLeftAlignParentLeft(View view)
+    {
+        return getPaddingLeft();
+    }
+
+    private int getLeftAlignParentRight(View view)
+    {
+        return getWidth() - getPaddingRight() - view.getWidth();
+    }
+
+    private int getLeftAlignParentCenter(View view)
+    {
+        return (getLeftAlignParentRight(view) + getLeftAlignParentLeft(view)) / 2;
+    }
+
     private void doScroll()
     {
         final int startX = mChild.getLeft();
-        final int startY = mChild.getTop();
-        final int endX = getPaddingLeft();
-        final int endY = getPaddingTop();
 
-        final boolean scroll = getScroller().scrollTo(startX, startY, endX, endY, -1);
+        int endX = getLeftAlignParentLeft(mChild);
+        if (startX >= getLeftAlignParentCenter(mChild))
+        {
+            endX = getLeftAlignParentRight(mChild);
+        }
+
+        final boolean scroll = getScroller().scrollToX(startX, endX, -1);
         if (scroll)
         {
             invalidate();
