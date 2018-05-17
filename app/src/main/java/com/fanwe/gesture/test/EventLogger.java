@@ -22,22 +22,32 @@ public class EventLogger
         String eventString = "";
         if (event != null)
         {
-            switch (event.getAction())
+            final int actionMasked = event.getActionMasked();
+            final int actionIndex = event.getActionIndex();
+            final int pointerId = event.getPointerId(actionIndex);
+
+            switch (actionMasked)
             {
                 case MotionEvent.ACTION_DOWN:
-                    eventString = "ACTION_DOWN";
+                    eventString = "ACTION_DOWN " + actionIndex + " " + pointerId;
+                    break;
+                case MotionEvent.ACTION_POINTER_DOWN:
+                    eventString = "ACTION_POINTER_DOWN " + actionIndex + " " + pointerId;
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    eventString = "ACTION_MOVE";
+                    eventString = "ACTION_MOVE " + actionIndex + " " + pointerId;
                     break;
                 case MotionEvent.ACTION_UP:
-                    eventString = "ACTION_UP";
+                    eventString = "ACTION_UP " + actionIndex + " " + pointerId;
+                    break;
+                case MotionEvent.ACTION_POINTER_UP:
+                    eventString = "ACTION_POINTER_UP " + actionIndex + " " + pointerId;
                     break;
                 case MotionEvent.ACTION_CANCEL:
-                    eventString = "ACTION_CANCEL";
+                    eventString = "ACTION_CANCEL " + actionIndex + " " + pointerId;
                     break;
                 default:
-                    eventString = "ACTION_DEFAULT:" + event.getAction();
+                    eventString = "ACTION_DEFAULT:" + actionMasked + " " + pointerId;
                     break;
             }
         }
