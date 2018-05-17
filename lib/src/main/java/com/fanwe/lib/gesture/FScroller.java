@@ -185,6 +185,9 @@ public class FScroller
 
         if (fling)
         {
+            mLastX = startX;
+            mLastY = startY;
+
             mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
             updateFinished();
         }
