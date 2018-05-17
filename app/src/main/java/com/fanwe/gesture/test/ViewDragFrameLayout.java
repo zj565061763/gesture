@@ -59,8 +59,8 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public void onScroll(int currX, int currY, int lastX, int lastY)
                 {
-                    ViewCompat.offsetLeftAndRight(mChild, currX - lastX);
-                    ViewCompat.offsetTopAndBottom(mChild, currY - lastY);
+                    offsetLeftAndRightLegal(mChild, currX - lastX);
+                    offsetTopAndBottomLegal(mChild, currY - lastY);
 
                     Log.i(TAG, "onScroll:" + mChild.getLeft() + "," + mChild.getTop());
                 }
@@ -94,8 +94,8 @@ public class ViewDragFrameLayout extends FrameLayout
                     final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_LAST);
                     final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_LAST);
 
-                    ViewCompat.offsetLeftAndRight(mChild, dx);
-                    ViewCompat.offsetTopAndBottom(mChild, dy);
+                    offsetLeftAndRightLegal(mChild, dx);
+                    offsetTopAndBottomLegal(mChild, dy);
 
                     return true;
                 }
@@ -115,11 +115,20 @@ public class ViewDragFrameLayout extends FrameLayout
 
     private void offsetLeftAndRightLegal(View view, int delta)
     {
-        delta = FTouchHelper.getLegalDelta(view.getLeft(),
-                FTouchHelper.getLeftAlignParentLeft(this, view, true),
-                FTouchHelper.getLeftAlignParentRight(this, view, true),
-                delta);
+        final int min = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
+        final int max = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
+
+        delta = FTouchHelper.getLegalDelta(view.getLeft(), min, max, delta);
         ViewCompat.offsetLeftAndRight(view, delta);
+    }
+
+    private void offsetTopAndBottomLegal(View view, int delta)
+    {
+        final int min = FTouchHelper.getTopAlignParentTop(this, mChild, true);
+        final int max = FTouchHelper.getTopAlignParentBottom(this, mChild, true);
+
+        delta = FTouchHelper.getLegalDelta(view.getTop(), min, max, delta);
+        ViewCompat.offsetTopAndBottom(view, delta);
     }
 
     private void doScroll()

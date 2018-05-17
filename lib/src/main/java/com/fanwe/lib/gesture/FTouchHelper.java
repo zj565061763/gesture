@@ -420,6 +420,26 @@ public class FTouchHelper
         return align;
     }
 
+    public static int getTopAlignParentTop(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getPaddingTop();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align += ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).topMargin;
+        }
+        return align;
+    }
+
+    public static int getTopAlignParentBottom(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getHeight() - parent.getPaddingTop() - child.getHeight();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align -= ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).bottomMargin;
+        }
+        return align;
+    }
+
     /**
      * view是否已经滚动到最左边
      *
