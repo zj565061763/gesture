@@ -119,7 +119,7 @@ public class FGestureManager
         switch (event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
-                return mCallback.consumeDownEvent(event);
+                return mCallback.onActionDown(event);
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 mTagHolder.reset();
@@ -169,7 +169,7 @@ public class FGestureManager
          * @param event
          * @return
          */
-        public boolean consumeDownEvent(MotionEvent event)
+        public boolean onActionDown(MotionEvent event)
         {
             return true;
         }
