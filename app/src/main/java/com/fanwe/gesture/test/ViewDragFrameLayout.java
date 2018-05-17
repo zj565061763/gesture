@@ -105,21 +105,42 @@ public class ViewDragFrameLayout extends FrameLayout
                 {
                     if (hasConsumeEvent)
                     {
-                        final int startX = mChild.getLeft();
-                        final int startY = mChild.getTop();
-                        final int endX = getPaddingLeft();
-                        final int endY = getPaddingTop();
-
-                        final boolean isScroll = getScroller().scrollTo(startX, startY, endX, endY, -1);
-                        if (isScroll)
-                        {
-                            invalidate();
-                        }
+                        doScroll();
                     }
                 }
             });
         }
         return mGestureManager;
+    }
+
+    private void doScroll()
+    {
+        final int startX = mChild.getLeft();
+        final int startY = mChild.getTop();
+        final int endX = getPaddingLeft();
+        final int endY = getPaddingTop();
+
+        final boolean scroll = getScroller().scrollTo(startX, startY, endX, endY, -1);
+        if (scroll)
+        {
+            invalidate();
+        }
+    }
+
+    private void doFling(VelocityTracker velocityTracker)
+    {
+        velocityTracker.computeCurrentVelocity(1000);
+
+        final int startX = mChild.getLeft();
+        final int velocityX = (int) velocityTracker.getXVelocity();
+        final int minX = getPaddingLeft();
+        final int maxX = getWidth() - getPaddingRight() - mChild.getWidth();
+
+        final boolean fling = getScroller().flingX(startX, velocityX, minX, maxX);
+        if (fling)
+        {
+            invalidate();
+        }
     }
 
     @Override
