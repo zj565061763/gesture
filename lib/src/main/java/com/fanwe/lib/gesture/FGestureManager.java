@@ -119,7 +119,7 @@ public class FGestureManager
         switch (event.getAction())
         {
             case MotionEvent.ACTION_DOWN:
-                return mCallback.consumeDownEvent();
+                return mCallback.consumeDownEvent(event);
             case MotionEvent.ACTION_UP:
             case MotionEvent.ACTION_CANCEL:
                 mTagHolder.reset();
@@ -166,9 +166,10 @@ public class FGestureManager
          * <br>
          * 注意，只有此方法返回了true，才有后续的移动等事件，默认返回true
          *
+         * @param event
          * @return
          */
-        public boolean consumeDownEvent()
+        public boolean consumeDownEvent(MotionEvent event)
         {
             return true;
         }
