@@ -186,16 +186,6 @@ public class FScroller
         return fling;
     }
 
-    public int getCurrX()
-    {
-        return mScroller.getCurrX();
-    }
-
-    public int getCurrY()
-    {
-        return mScroller.getCurrY();
-    }
-
     /**
      * 返回根据滚动距离和滚动速度算出的滚动时长
      *
