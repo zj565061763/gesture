@@ -151,8 +151,8 @@ public class ViewDragFrameLayout extends FrameLayout
 
         final int startX = mChild.getLeft();
         final int velocityX = (int) velocityTracker.getXVelocity();
-        final int minX = getPaddingLeft();
-        final int maxX = getWidth() - getPaddingRight() - mChild.getWidth();
+        final int minX = getLeftAlignParentLeft(mChild);
+        final int maxX = getLeftAlignParentRight(mChild);
 
         final boolean fling = getScroller().flingX(startX, velocityX, minX, maxX);
         if (fling)
