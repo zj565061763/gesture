@@ -48,16 +48,11 @@ public class FScroller
         mScroller = scroller;
     }
 
-    private void updateFinished()
-    {
-        final boolean isFinished = isFinished();
-        if (mIsFinished != isFinished)
-        {
-            mIsFinished = isFinished;
-            if (mCallback != null) mCallback.onScrollStateChanged(isFinished);
-        }
-    }
-
+    /**
+     * 设置回调
+     *
+     * @param callback
+     */
     public void setCallback(Callback callback)
     {
         mCallback = callback;
@@ -202,6 +197,16 @@ public class FScroller
     {
         mScroller.abortAnimation();
         updateFinished();
+    }
+
+    private void updateFinished()
+    {
+        final boolean isFinished = isFinished();
+        if (mIsFinished != isFinished)
+        {
+            mIsFinished = isFinished;
+            if (mCallback != null) mCallback.onScrollStateChanged(isFinished);
+        }
     }
 
     /**
