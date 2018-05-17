@@ -92,18 +92,19 @@ public class ViewDragFrameLayout extends FrameLayout
                     {
                         final View child = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
                         setChild(child);
-                    }
-
-                    final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
-                    final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
-
-                    final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-
-                    if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
+                        return false;
+                    } else
                     {
                         if (mChild != null)
                         {
-                            return true;
+                            final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
+                            final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
+                            final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+
+                            if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
+                            {
+                                return true;
+                            }
                         }
                     }
 
