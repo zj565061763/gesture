@@ -147,24 +147,37 @@ public class FScroller
      */
     public final boolean scrollDelta(int startX, int startY, int dx, int dy, int duration)
     {
-        if (dx == 0 && dy == 0)
+        final boolean scroll = dx != 0 || dy != 0;
+        if (scroll)
         {
-            abortAnimation();
-            return false;
+            mLastX = startX;
+            mLastY = startY;
+
+            if (duration < 0)
+            {
+                duration = getDuration(dx, dy);
+            }
+
+            mScroller.startScroll(startX, startY, dx, dy, duration);
+            updateFinished();
         }
+        return scroll;
+    }
 
-        mLastX = startX;
-        mLastY = startY;
+    public boolean fling(int startX, int startY,
+                         int velocityX, int velocityY,
+                         int minX, int maxX,
+                         int minY, int maxY)
+    {
+        final boolean fling = (startX > minX && startX < maxX && velocityX != 0)
+                || (startY > minY && startY < minY && velocityY != 0);
 
-        if (duration < 0)
+        if (fling)
         {
-            duration = getDuration(dx, dy);
+            mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
+            updateFinished();
         }
-
-        mScroller.startScroll(startX, startY, dx, dy, duration);
-        updateFinished();
-
-        return true;
+        return fling;
     }
 
     /**
