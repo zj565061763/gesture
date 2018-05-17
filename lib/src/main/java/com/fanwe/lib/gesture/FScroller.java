@@ -78,31 +78,31 @@ public class FScroller
     /**
      * 设置最大滚动距离
      *
-     * @param maxScrollDistance
+     * @param distance
      */
-    public final void setMaxScrollDistance(int maxScrollDistance)
+    public final void setMaxScrollDistance(int distance)
     {
-        mMaxScrollDistance = maxScrollDistance;
+        mMaxScrollDistance = distance;
     }
 
     /**
      * 设置最大滚动时长
      *
-     * @param maxScrollDuration
+     * @param duration
      */
-    public final void setMaxScrollDuration(int maxScrollDuration)
+    public final void setMaxScrollDuration(int duration)
     {
-        mMaxScrollDuration = maxScrollDuration;
+        mMaxScrollDuration = duration;
     }
 
     /**
      * 设置最小滚动时长
      *
-     * @param minScrollDuration
+     * @param duration
      */
-    public final void setMinScrollDuration(int minScrollDuration)
+    public final void setMinScrollDuration(int duration)
     {
-        mMinScrollDuration = minScrollDuration;
+        mMinScrollDuration = duration;
     }
 
     // scrollTo
