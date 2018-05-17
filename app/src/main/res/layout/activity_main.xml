@@ -1,18 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <com.fanwe.gesture.test.FirstFrameLayout
+    <Button
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:onClick="onClickTestEventActivity"
+        android:text="TestEventActivity"
+        android:textAllCaps="false" />
 
-        <com.fanwe.gesture.test.SecondFrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </com.fanwe.gesture.test.SecondFrameLayout>
-
-    </com.fanwe.gesture.test.FirstFrameLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="onClickTestViewDragHelperActivity"
+        android:text="TestViewDragHelperActivity"
+        android:textAllCaps="false" />
 
 </LinearLayout>
