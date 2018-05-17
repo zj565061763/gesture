@@ -53,7 +53,7 @@ public class FScroller
      *
      * @param callback
      */
-    public void setCallback(Callback callback)
+    public final void setCallback(Callback callback)
     {
         mCallback = callback;
     }
@@ -63,7 +63,7 @@ public class FScroller
      *
      * @return true-滚动结束，false-滚动中
      */
-    public boolean isFinished()
+    public final boolean isFinished()
     {
         /**
          * 这里返回当前对象保存的属性
@@ -77,7 +77,7 @@ public class FScroller
      *
      * @param maxScrollDistance
      */
-    public void setMaxScrollDistance(int maxScrollDistance)
+    public final void setMaxScrollDistance(int maxScrollDistance)
     {
         mMaxScrollDistance = maxScrollDistance;
     }
@@ -87,7 +87,7 @@ public class FScroller
      *
      * @param maxScrollDuration
      */
-    public void setMaxScrollDuration(int maxScrollDuration)
+    public final void setMaxScrollDuration(int maxScrollDuration)
     {
         mMaxScrollDuration = maxScrollDuration;
     }
@@ -97,23 +97,23 @@ public class FScroller
      *
      * @param minScrollDuration
      */
-    public void setMinScrollDuration(int minScrollDuration)
+    public final void setMinScrollDuration(int minScrollDuration)
     {
         mMinScrollDuration = minScrollDuration;
     }
 
     // scrollTo
-    public boolean scrollToX(int startX, int endX, int duration)
+    public final boolean scrollToX(int startX, int endX, int duration)
     {
         return scrollTo(startX, 0, endX, 0, duration);
     }
 
-    public boolean scrollToY(int startY, int endY, int duration)
+    public final boolean scrollToY(int startY, int endY, int duration)
     {
         return scrollTo(0, startY, 0, endY, duration);
     }
 
-    public boolean scrollTo(int startX, int startY, int endX, int endY, int duration)
+    public final boolean scrollTo(int startX, int startY, int endX, int endY, int duration)
     {
         final int dx = endX - startX;
         final int dy = endY - startY;
@@ -122,12 +122,12 @@ public class FScroller
     }
 
     // scrollDelta
-    public boolean scrollDeltaX(int startX, int dx, int duration)
+    public final boolean scrollDeltaX(int startX, int dx, int duration)
     {
         return scrollDelta(startX, 0, dx, 0, duration);
     }
 
-    public boolean scrollDeltaY(int startY, int dy, int duration)
+    public final boolean scrollDeltaY(int startY, int dy, int duration)
     {
         return scrollDelta(0, startY, 0, dy, duration);
     }
@@ -142,7 +142,7 @@ public class FScroller
      * @param duration
      * @return true-提交滚动任务成功
      */
-    public boolean scrollDelta(int startX, int startY, int dx, int dy, int duration)
+    public final boolean scrollDelta(int startX, int startY, int dx, int dy, int duration)
     {
         if (dx == 0 && dy == 0)
         {
@@ -153,11 +153,27 @@ public class FScroller
         mLastX = startX;
         mLastY = startY;
 
-        if (duration < 0) duration = getDuration(dx, dy);
-        mScroller.startScroll(startX, startY, dx, dy, duration);
+        if (duration < 0)
+        {
+            duration = getDuration(dx, dy);
+        }
 
+        mScroller.startScroll(startX, startY, dx, dy, duration);
         updateFinished();
+
         return true;
+    }
+
+    /**
+     * 返回根据滚动距离和滚动速度算出的滚动时长
+     *
+     * @param dx x滚动距离
+     * @param dy y滚动距离
+     * @return
+     */
+    public final int getDuration(int dx, int dy)
+    {
+        return computeDuration(dx, dy, mMaxScrollDistance, mMaxScrollDuration, mMinScrollDuration);
     }
 
     /**
@@ -165,7 +181,7 @@ public class FScroller
      *
      * @return true-滚动中，false-滚动结束
      */
-    public boolean computeScrollOffset()
+    public final boolean computeScrollOffset()
     {
         final boolean compute = mScroller.computeScrollOffset();
 
@@ -193,7 +209,7 @@ public class FScroller
     /**
      * 停止滚动
      */
-    public void abortAnimation()
+    public final void abortAnimation()
     {
         mScroller.abortAnimation();
         updateFinished();
@@ -205,22 +221,21 @@ public class FScroller
         if (mIsFinished != isFinished)
         {
             mIsFinished = isFinished;
+
+            onScrollStateChanged(isFinished);
             if (mCallback != null) mCallback.onScrollStateChanged(isFinished);
         }
     }
 
     /**
-     * 返回根据滚动距离和滚动速度算出的滚动时长
+     * 滚动状态变化回调
      *
-     * @param dx x滚动距离
-     * @param dy y滚动距离
-     * @return
+     * @param isFinished true-滚动结束，false-滚动中
      */
-    public int getDuration(int dx, int dy)
+    protected void onScrollStateChanged(boolean isFinished)
     {
-        final int duration = computeDuration(dx, dy, mMaxScrollDistance, mMaxScrollDuration, mMinScrollDuration);
-        return duration;
     }
+
 
     /**
      * 计算时长
