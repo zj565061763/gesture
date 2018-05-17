@@ -20,6 +20,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.view.ViewParent;
 
 /**
@@ -375,6 +376,28 @@ public class FTouchHelper
         view.getLocationOnScreen(location);
         return x >= location[0] && x < location[0] + view.getWidth()
                 && y >= location[1] && y < location[1] + view.getHeight();
+    }
+
+    /**
+     * 找到parent中处于指定坐标下最顶部的child
+     *
+     * @param parent
+     * @param x
+     * @param y
+     * @return
+     */
+    public static View findTopChildUnder(ViewGroup parent, int x, int y)
+    {
+        final int count = parent.getChildCount();
+        for (int i = count - 1; i >= 0; i--)
+        {
+            final View child = parent.getChildAt(i);
+            if (isViewUnder(child, x, y))
+            {
+                return child;
+            }
+        }
+        return null;
     }
 
     /**

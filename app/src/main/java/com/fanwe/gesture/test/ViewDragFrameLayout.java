@@ -1,106 +1,124 @@
 package com.fanwe.gesture.test;
 
 import android.content.Context;
-import android.support.v4.widget.ViewDragHelper;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Scroller;
+
+import com.fanwe.lib.gesture.FGestureManager;
+import com.fanwe.lib.gesture.FScroller;
+import com.fanwe.lib.gesture.FTouchHelper;
 
 public class ViewDragFrameLayout extends FrameLayout
 {
     public ViewDragFrameLayout(Context context)
     {
         super(context);
-        init();
     }
 
     public ViewDragFrameLayout(Context context, AttributeSet attrs)
     {
         super(context, attrs);
-        init();
     }
 
     public ViewDragFrameLayout(Context context, AttributeSet attrs, int defStyleAttr)
     {
         super(context, attrs, defStyleAttr);
-        init();
     }
 
     private static final String TAG = ViewDragFrameLayout.class.getSimpleName();
 
-    private ViewDragHelper mViewDragHelper;
+    private FGestureManager mGestureManager;
+    private FScroller mScroller;
 
-    private void init()
+    private View mChild;
+
+    private FScroller getScroller()
     {
-        mViewDragHelper = ViewDragHelper.create(this, new ViewDragHelper.Callback()
+        if (mScroller == null)
         {
-            @Override
-            public boolean tryCaptureView(View child, int pointerId)
+            mScroller = new FScroller(new Scroller(getContext()));
+            mScroller.setCallback(new FScroller.Callback()
             {
-                return true;
-            }
+                @Override
+                public void onScrollStateChanged(boolean isFinished)
+                {
 
-            @Override
-            public int clampViewPositionHorizontal(View child, int left, int dx)
-            {
-                final int min = getPaddingLeft();
-                final int max = getWidth() - getPaddingRight() - child.getWidth();
-                return Math.min(Math.max(left, min), max);
-            }
+                }
 
-            @Override
-            public int clampViewPositionVertical(View child, int top, int dy)
-            {
-                final int min = getPaddingTop();
-                final int max = getHeight() - getPaddingBottom() - child.getHeight();
-                return Math.min(Math.max(top, min), max);
-            }
+                @Override
+                public void onScroll(int dx, int dy)
+                {
 
-            @Override
-            public void onViewCaptured(View capturedChild, int activePointerId)
-            {
-                super.onViewCaptured(capturedChild, activePointerId);
-                Log.i(TAG, "onViewCaptured");
-            }
+                }
+            });
+        }
+        return mScroller;
+    }
 
-            @Override
-            public void onViewReleased(View releasedChild, float xvel, float yvel)
+    private FGestureManager getGestureManager()
+    {
+        if (mGestureManager == null)
+        {
+            mGestureManager = new FGestureManager(new FGestureManager.Callback()
             {
-                super.onViewReleased(releasedChild, xvel, yvel);
-                Log.i(TAG, "onViewReleased:" + xvel + " " + yvel);
-                mViewDragHelper.settleCapturedViewAt(getPaddingLeft(), getPaddingTop());
-                invalidate();
-            }
+                @Override
+                public boolean onEventActionDown(MotionEvent event)
+                {
+                    final View child = FTouchHelper.findTopChildUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
+                    if (child != null) mChild = child;
+                    return child != null;
+                }
 
-            @Override
-            public void onViewDragStateChanged(int state)
-            {
-                super.onViewDragStateChanged(state);
-                Log.e(TAG, "onViewDragStateChanged:" + state);
-            }
-        });
+                @Override
+                public boolean shouldConsumeEvent(MotionEvent event)
+                {
+                    return mChild != null;
+                }
+
+                @Override
+                public boolean onEventConsume(MotionEvent event)
+                {
+                    final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_LAST);
+                    final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_LAST);
+
+                    ViewCompat.offsetLeftAndRight(mChild, dx);
+                    ViewCompat.offsetTopAndBottom(mChild, dy);
+
+                    return true;
+                }
+
+                @Override
+                public void onEventFinish(MotionEvent event, boolean hasConsumeEvent, VelocityTracker velocityTracker)
+                {
+
+                }
+            });
+        }
+        return mGestureManager;
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev)
     {
-        return mViewDragHelper.shouldInterceptTouchEvent(ev);
+        return getGestureManager().onInterceptTouchEvent(ev);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
-        mViewDragHelper.processTouchEvent(event);
-        return mViewDragHelper.getCapturedView() != null;
+        return getGestureManager().onTouchEvent(event);
     }
 
     @Override
     public void computeScroll()
     {
         super.computeScroll();
-        if (mViewDragHelper.continueSettling(false))
+        if (getScroller().computeScrollOffset())
         {
             invalidate();
         }
