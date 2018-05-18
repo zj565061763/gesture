@@ -102,8 +102,8 @@ public class ViewDragFrameLayout extends FrameLayout
                         case MotionEvent.ACTION_MOVE:
                             if (mChild != null)
                             {
-                                final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
-                                final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
+                                final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFromDown();
+                                final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFromDown();
                                 final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 
                                 if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
@@ -136,8 +136,8 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public boolean onEventConsume(MotionEvent event)
                 {
-                    final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_LAST);
-                    final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_LAST);
+                    final int dx = (int) getGestureManager().getTouchHelper().getDeltaX();
+                    final int dy = (int) getGestureManager().getTouchHelper().getDeltaY();
 
                     offsetLeftAndRightLegal(mChild, dx);
                     offsetTopAndBottomLegal(mChild, dy);

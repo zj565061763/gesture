@@ -33,31 +33,14 @@ public class FTouchHelper
 {
     private boolean mIsDebug;
 
-    /**
-     * 最后一次ACTION_DOWN事件
-     */
-    public static final int EVENT_DOWN = 0;
-    /**
-     * 当前事件的上一次事件
-     */
-    public static final int EVENT_LAST = 1;
-
     private float mCurrentX;
     private float mCurrentY;
+
     private float mLastX;
     private float mLastY;
 
     private float mDownX;
     private float mDownY;
-
-    private float mMoveX;
-    private float mMoveY;
-
-    private float mUpX;
-    private float mUpY;
-
-    private float mCancelX;
-    private float mCancelY;
 
     public void setDebug(boolean debug)
     {
@@ -77,26 +60,11 @@ public class FTouchHelper
         mCurrentX = ev.getRawX();
         mCurrentY = ev.getRawY();
 
-        switch (ev.getAction())
+        final int aciton = ev.getAction();
+        if (aciton == MotionEvent.ACTION_DOWN)
         {
-            case MotionEvent.ACTION_DOWN:
-                mDownX = mCurrentX;
-                mDownY = mCurrentY;
-                break;
-            case MotionEvent.ACTION_MOVE:
-                mMoveX = mCurrentX;
-                mMoveY = mCurrentY;
-                break;
-            case MotionEvent.ACTION_UP:
-                mUpX = mCurrentX;
-                mUpY = mCurrentY;
-                break;
-            case MotionEvent.ACTION_CANCEL:
-                mCancelX = mCurrentX;
-                mCancelY = mCurrentY;
-                break;
-            default:
-                break;
+            mDownX = mCurrentX;
+            mDownY = mCurrentY;
         }
 
         if (mIsDebug)
@@ -136,109 +104,109 @@ public class FTouchHelper
         return mDownY;
     }
 
-    public float getMoveX()
-    {
-        return mMoveX;
-    }
+    //---------- Delta Start ----------
 
-    public float getMoveY()
+    /**
+     * 返回当前事件和上一次事件之间的x轴方向增量
+     *
+     * @return
+     */
+    public float getDeltaX()
     {
-        return mMoveY;
-    }
-
-    public float getUpX()
-    {
-        return mUpX;
-    }
-
-    public float getUpY()
-    {
-        return mUpY;
-    }
-
-    public float getCancelX()
-    {
-        return mCancelX;
-    }
-
-    public float getCancelY()
-    {
-        return mCancelY;
+        return mCurrentX - mLastX;
     }
 
     /**
-     * 返回当前事件和指定事件之间的x轴方向增量
-     *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
-     * @return
+     * 返回当前事件和上一次事件之间的y轴方向增量
      */
-    public float getDeltaXFrom(int event)
+    public float getDeltaY()
     {
-        switch (event)
-        {
-            case EVENT_DOWN:
-                return mCurrentX - mDownX;
-            case EVENT_LAST:
-                return mCurrentX - mLastX;
-            default:
-                return 0;
-        }
+        return mCurrentY - mLastY;
     }
 
     /**
-     * 返回当前事件和指定事件之间的y轴方向增量
+     * 返回当前事件和{@link MotionEvent#ACTION_DOWN}事件之间的x轴方向增量
      *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
      * @return
      */
-    public float getDeltaYFrom(int event)
+    public float getDeltaXFromDown()
     {
-        switch (event)
-        {
-            case EVENT_DOWN:
-                return mCurrentY - mDownY;
-            case EVENT_LAST:
-                return mCurrentY - mLastY;
-            default:
-                return 0;
-        }
+        return mCurrentX - mDownX;
     }
 
     /**
-     * 返回当前事件和指定事件之间的x轴方向夹角
+     * 返回当前事件和{@link MotionEvent#ACTION_DOWN}事件之间的y轴方向增量
      *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
      * @return
      */
-    public double getDegreeXFrom(int event)
+    public float getDeltaYFromDown()
     {
-        final float dx = getDeltaXFrom(event);
-        if (dx == 0)
-        {
-            return 0;
-        }
-        final float dy = getDeltaYFrom(event);
+        return mCurrentY - mDownY;
+    }
+
+    //---------- Delta End ----------
+
+
+    //---------- Degree Start ----------
+
+    /**
+     * 返回当前事件和上一次事件之间的x轴方向夹角
+     *
+     * @return
+     */
+    public double getDegreeX()
+    {
+        final float dx = getDeltaX();
+        if (dx == 0) return 0;
+        final float dy = getDeltaY();
         final float angle = Math.abs(dy) / Math.abs(dx);
         return Math.toDegrees(Math.atan(angle));
     }
 
     /**
-     * 返回当前事件和指定事件之间的y轴方向夹角
+     * 返回当前事件和上一次事件之间的y轴方向夹角
      *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
      * @return
      */
-    public double getDegreeYFrom(int event)
+    public double getDegreeY()
     {
-        final float dy = getDeltaYFrom(event);
-        if (dy == 0)
-        {
-            return 0;
-        }
-        final float dx = getDeltaXFrom(event);
+        final float dy = getDeltaY();
+        if (dy == 0) return 0;
+        final float dx = getDeltaX();
         final float angle = Math.abs(dx) / Math.abs(dy);
         return Math.toDegrees(Math.atan(angle));
     }
+
+    /**
+     * 返回当前事件和{@link MotionEvent#ACTION_DOWN}事件之间的x轴方向夹角
+     *
+     * @return
+     */
+    public double getDegreeXFromDown()
+    {
+        final float dx = getDeltaXFromDown();
+        if (dx == 0) return 0;
+        final float dy = getDeltaYFromDown();
+        final float angle = Math.abs(dy) / Math.abs(dx);
+        return Math.toDegrees(Math.atan(angle));
+    }
+
+    /**
+     * 返回当前事件和{@link MotionEvent#ACTION_DOWN}事件之间的y轴方向夹角
+     *
+     * @return
+     */
+    public double getDegreeYFromDown()
+    {
+        final float dy = getDeltaYFromDown();
+        if (dy == 0) return 0;
+        final float dx = getDeltaXFromDown();
+        final float angle = Math.abs(dx) / Math.abs(dy);
+        return Math.toDegrees(Math.atan(angle));
+    }
+
+    //---------- Degree End ----------
+
 
     /**
      * 是否是点击事件
@@ -255,8 +223,8 @@ public class FTouchHelper
             final int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
             final long duration = event.getEventTime() - event.getDownTime();
-            final int dx = (int) getDeltaXFrom(FTouchHelper.EVENT_DOWN);
-            final int dy = (int) getDeltaYFrom(FTouchHelper.EVENT_DOWN);
+            final int dx = (int) getDeltaXFromDown();
+            final int dy = (int) getDeltaYFromDown();
 
             if (duration < clickTimeout && dx < touchSlop && dy < touchSlop)
             {
@@ -264,50 +232,6 @@ public class FTouchHelper
             }
         }
         return false;
-    }
-
-    /**
-     * 返回当前事件相对于指定事件是否向左移动
-     *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
-     * @return
-     */
-    public boolean isMoveLeftFrom(int event)
-    {
-        return getDeltaXFrom(event) < 0;
-    }
-
-    /**
-     * 返回当前事件相对于指定事件是否向上移动
-     *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
-     * @return
-     */
-    public boolean isMoveTopFrom(int event)
-    {
-        return getDeltaYFrom(event) < 0;
-    }
-
-    /**
-     * 返回当前事件相对于指定事件是否向右移动
-     *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
-     * @return
-     */
-    public boolean isMoveRightFrom(int event)
-    {
-        return getDeltaXFrom(event) > 0;
-    }
-
-    /**
-     * 返回当前事件相对于指定事件是否向下移动
-     *
-     * @param event {@link #EVENT_DOWN} {@link #EVENT_LAST}
-     * @return
-     */
-    public boolean isMoveBottomFrom(int event)
-    {
-        return getDeltaYFrom(event) > 0;
     }
 
     //----------static method start----------
@@ -527,13 +451,13 @@ public class FTouchHelper
     {
         StringBuilder sb = new StringBuilder("\r\n")
                 .append("Down:").append(mDownX).append(",").append(mDownY).append("\r\n")
-                .append("Move:").append(mMoveX).append(",").append(mMoveY).append("\r\n")
+                .append("Current:").append(mCurrentX).append(",").append(mCurrentY).append("\r\n")
 
-                .append("Delta from down:").append(getDeltaXFrom(EVENT_DOWN)).append(",").append(getDeltaYFrom(EVENT_DOWN)).append("\r\n")
-                .append("Delta from last:").append(getDeltaXFrom(EVENT_LAST)).append(",").append(getDeltaYFrom(EVENT_LAST)).append("\r\n")
+                .append("Delta from down:").append(getDeltaXFromDown()).append(",").append(getDeltaYFromDown()).append("\r\n")
+                .append("Delta from last:").append(getDeltaX()).append(",").append(getDeltaY()).append("\r\n")
 
-                .append("Degree from down:").append(getDegreeXFrom(EVENT_DOWN)).append(",").append(getDegreeYFrom(EVENT_DOWN)).append("\r\n")
-                .append("Degree from last:").append(getDegreeXFrom(EVENT_LAST)).append(",").append(getDegreeYFrom(EVENT_LAST)).append("\r\n");
+                .append("Degree from down:").append(getDegreeXFromDown()).append(",").append(getDegreeYFromDown()).append("\r\n")
+                .append("Degree from last:").append(getDegreeX()).append(",").append(getDegreeY()).append("\r\n");
         return sb;
     }
 }
