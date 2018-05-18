@@ -112,11 +112,6 @@ public class ViewDragFrameLayout extends FrameLayout
                                 }
                             }
                             break;
-                        case MotionEvent.ACTION_UP:
-                        case MotionEvent.ACTION_CANCEL:
-                            setChild(null);
-                            break;
-
                     }
                     return false;
                 }
