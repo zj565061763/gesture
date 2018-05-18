@@ -157,6 +157,7 @@ public class ViewDragFrameLayout extends FrameLayout
                     }
                 }
             });
+            mGestureManager.getTouchHelper().setDebug(true);
         }
         return mGestureManager;
     }
