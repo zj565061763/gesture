@@ -93,26 +93,31 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public boolean shouldInterceptEvent(MotionEvent event)
                 {
-                    if (event.getAction() == MotionEvent.ACTION_DOWN)
+                    switch (event.getAction())
                     {
-                        final View child = findMaxTopChild(event);
-                        setChild(child);
-                        return false;
-                    } else
-                    {
-                        if (mChild != null)
-                        {
-                            final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
-                            final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
-                            final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-
-                            if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
+                        case MotionEvent.ACTION_DOWN:
+                            final View child = findMaxTopChild(event);
+                            setChild(child);
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            if (mChild != null)
                             {
-                                return true;
-                            }
-                        }
-                    }
+                                final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFrom(FTouchHelper.EVENT_DOWN);
+                                final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFrom(FTouchHelper.EVENT_DOWN);
+                                final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 
+                                if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
+                                {
+                                    return true;
+                                }
+                            }
+                            break;
+                        case MotionEvent.ACTION_UP:
+                        case MotionEvent.ACTION_CANCEL:
+                            setChild(null);
+                            break;
+
+                    }
                     return false;
                 }
 
