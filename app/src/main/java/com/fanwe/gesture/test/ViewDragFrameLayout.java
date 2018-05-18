@@ -45,8 +45,11 @@ public class ViewDragFrameLayout extends FrameLayout
     {
         if (mChild != child)
         {
-            mChild = child;
-            Log.e(TAG, "setChild:" + child);
+            if (getScroller().isFinished())
+            {
+                mChild = child;
+                Log.e(TAG, "setChild:" + child);
+            }
         }
     }
 
