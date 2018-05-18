@@ -29,25 +29,25 @@ public class EventLogger
             switch (actionMasked)
             {
                 case MotionEvent.ACTION_DOWN:
-                    eventString = "ACTION_DOWN " + actionIndex + " " + pointerId;
+                    eventString = "ACTION_DOWN " + actionIndex + " " + pointerId + " (" + event.getX() + "," + event.getY() + ")";
                     break;
                 case MotionEvent.ACTION_POINTER_DOWN:
-                    eventString = "ACTION_POINTER_DOWN " + actionIndex + " " + pointerId;
+                    eventString = "ACTION_POINTER_DOWN " + actionIndex + " " + pointerId + " (" + event.getX() + "," + event.getY() + ")";
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    eventString = "ACTION_MOVE " + actionIndex + " " + pointerId;
+                    eventString = "ACTION_MOVE " + actionIndex + " " + pointerId + " (" + event.getX() + "," + event.getY() + ")";
                     break;
                 case MotionEvent.ACTION_UP:
-                    eventString = "ACTION_UP " + actionIndex + " " + pointerId;
+                    eventString = "ACTION_UP " + actionIndex + " " + pointerId + " (" + event.getX() + "," + event.getY() + ")";
                     break;
                 case MotionEvent.ACTION_POINTER_UP:
-                    eventString = "ACTION_POINTER_UP " + actionIndex + " " + pointerId;
+                    eventString = "ACTION_POINTER_UP " + actionIndex + " " + pointerId + " (" + event.getX() + "," + event.getY() + ")";
                     break;
                 case MotionEvent.ACTION_CANCEL:
-                    eventString = "ACTION_CANCEL " + actionIndex + " " + pointerId;
+                    eventString = "ACTION_CANCEL " + actionIndex + " " + pointerId + " (" + event.getX() + "," + event.getY() + ")";
                     break;
                 default:
-                    eventString = "ACTION_DEFAULT:" + actionMasked + " " + pointerId;
+                    eventString = "ACTION_DEFAULT:" + actionMasked + " " + pointerId + " (" + event.getX() + "," + event.getY() + ")";
                     break;
             }
         }
