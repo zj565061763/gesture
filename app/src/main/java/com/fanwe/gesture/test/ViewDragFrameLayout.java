@@ -153,7 +153,10 @@ public class ViewDragFrameLayout extends FrameLayout
                         doScroll();
                     } else
                     {
-                        setChild(null);
+                        if (getScroller().isFinished())
+                        {
+                            setChild(null);
+                        }
                     }
                 }
             });
