@@ -1,2 +1,2 @@
 # Gradle
-`implementation 'com.fanwe.android:gesture:1.0.6'`
+`implementation 'com.fanwe.android:gesture:1.0.7'`
