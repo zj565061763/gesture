@@ -33,7 +33,8 @@ public class FGestureManager
 
     public FGestureManager(Callback callback)
     {
-        if (callback == null) throw new NullPointerException("callback is null");
+        if (callback == null)
+            throw new NullPointerException("callback is null");
         mCallback = callback;
     }
 
@@ -60,9 +61,7 @@ public class FGestureManager
     private VelocityTracker getVelocityTracker()
     {
         if (mVelocityTracker == null)
-        {
             mVelocityTracker = VelocityTracker.obtain();
-        }
         return mVelocityTracker;
     }
 
@@ -102,9 +101,7 @@ public class FGestureManager
                 break;
             default:
                 if (mCallback.shouldInterceptEvent(event))
-                {
                     mTagHolder.setTagIntercept(true);
-                }
                 break;
         }
 
@@ -137,7 +134,8 @@ public class FGestureManager
                     mTagHolder.setTagConsume(consume);
 
                     // 标识消费过事件
-                    if (consume) mHasConsumeEvent = true;
+                    if (consume)
+                        mHasConsumeEvent = true;
                 } else
                 {
                     mTagHolder.setTagConsume(mCallback.shouldConsumeEvent(event));
