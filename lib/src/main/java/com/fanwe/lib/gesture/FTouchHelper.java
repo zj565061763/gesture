@@ -157,7 +157,9 @@ public class FTouchHelper
     public double getDegreeX()
     {
         final float dx = getDeltaX();
-        if (dx == 0) return 0;
+        if (dx == 0)
+            return 0;
+
         final float dy = getDeltaY();
         final float angle = Math.abs(dy) / Math.abs(dx);
         return Math.toDegrees(Math.atan(angle));
@@ -171,7 +173,9 @@ public class FTouchHelper
     public double getDegreeY()
     {
         final float dy = getDeltaY();
-        if (dy == 0) return 0;
+        if (dy == 0)
+            return 0;
+
         final float dx = getDeltaX();
         final float angle = Math.abs(dx) / Math.abs(dy);
         return Math.toDegrees(Math.atan(angle));
@@ -185,7 +189,9 @@ public class FTouchHelper
     public double getDegreeXFromDown()
     {
         final float dx = getDeltaXFromDown();
-        if (dx == 0) return 0;
+        if (dx == 0)
+            return 0;
+
         final float dy = getDeltaYFromDown();
         final float angle = Math.abs(dy) / Math.abs(dx);
         return Math.toDegrees(Math.atan(angle));
@@ -199,7 +205,9 @@ public class FTouchHelper
     public double getDegreeYFromDown()
     {
         final float dy = getDeltaYFromDown();
-        if (dy == 0) return 0;
+        if (dy == 0)
+            return 0;
+
         final float dx = getDeltaXFromDown();
         final float angle = Math.abs(dx) / Math.abs(dy);
         return Math.toDegrees(Math.atan(angle));
@@ -227,9 +235,7 @@ public class FTouchHelper
             final int dy = (int) getDeltaYFromDown();
 
             if (duration < clickTimeout && dx < touchSlop && dy < touchSlop)
-            {
                 return true;
-            }
         }
         return false;
     }
@@ -247,7 +253,8 @@ public class FTouchHelper
      */
     public static int getLegalDelta(int current, int min, int max, int delta)
     {
-        if (delta == 0) return 0;
+        if (delta == 0)
+            return 0;
 
         final int future = current + delta;
         if (future < min)
@@ -270,9 +277,7 @@ public class FTouchHelper
     {
         final ViewParent parent = view.getParent();
         if (parent != null)
-        {
             parent.requestDisallowInterceptTouchEvent(disallowIntercept);
-        }
     }
 
     /**
