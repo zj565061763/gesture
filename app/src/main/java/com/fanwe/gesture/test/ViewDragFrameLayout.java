@@ -72,7 +72,7 @@ public class ViewDragFrameLayout extends FrameLayout
                 }
 
                 @Override
-                public void onComputeScrollOffset(int currX, int currY, int lastX, int lastY)
+                public void onComputeScrollOffset(int lastX, int lastY, int currX, int currY)
                 {
                     final int dx = currX - lastX;
                     final int dy = currY - lastY;
