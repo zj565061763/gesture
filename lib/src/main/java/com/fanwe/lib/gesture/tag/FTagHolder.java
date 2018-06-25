@@ -57,7 +57,8 @@ public class FTagHolder implements TagHolder
         {
             mTagIntercept = tagIntercept;
             onTagInterceptChanged(tagIntercept);
-            if (mCallback != null) mCallback.onTagInterceptChanged(tagIntercept);
+            if (mCallback != null)
+                mCallback.onTagInterceptChanged(tagIntercept);
         }
     }
 
@@ -72,7 +73,8 @@ public class FTagHolder implements TagHolder
         {
             mTagConsume = tagConsume;
             onTagConsumeChanged(tagConsume);
-            if (mCallback != null) mCallback.onTagConsumeChanged(tagConsume);
+            if (mCallback != null)
+                mCallback.onTagConsumeChanged(tagConsume);
         }
     }
 

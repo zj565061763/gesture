@@ -45,9 +45,8 @@ public class FScroller
     public FScroller(Scroller scroller)
     {
         if (scroller == null)
-        {
             throw new NullPointerException("scroller is null");
-        }
+
         mScroller = scroller;
     }
 
@@ -155,9 +154,7 @@ public class FScroller
             mLastY = startY;
 
             if (duration < 0)
-            {
                 duration = computeDuration(dx, dy, mMaxScrollDistance, mMaxScrollDuration, mMinScrollDuration);
-            }
 
             mScroller.startScroll(startX, startY, dx, dy, duration);
             updateFinished();
@@ -210,8 +207,9 @@ public class FScroller
         {
             if (currX != mLastX || currY != mLastY)
             {
-                onScroll(currX, currY, mLastX, mLastY);
-                if (mCallback != null) mCallback.onScroll(currX, currY, mLastX, mLastY);
+                onComputeScrollOffset(mLastX, mLastY, currX, currY);
+                if (mCallback != null)
+                    mCallback.onComputeScrollOffset(mLastX, mLastY, currX, currY);
             }
         }
 
@@ -239,7 +237,8 @@ public class FScroller
             mIsFinished = finish;
 
             onScrollStateChanged(finish);
-            if (mCallback != null) mCallback.onScrollStateChanged(finish);
+            if (mCallback != null)
+                mCallback.onScrollStateChanged(finish);
         }
     }
 
@@ -255,12 +254,12 @@ public class FScroller
     /**
      * 调用{@link FScroller#computeScrollOffset()}后触发
      *
-     * @param currX 当前x
-     * @param currY 当前y
      * @param lastX 上一次的x
      * @param lastY 上一次的y
+     * @param currX 当前x
+     * @param currY 当前y
      */
-    protected void onScroll(int currX, int currY, int lastX, int lastY)
+    protected void onComputeScrollOffset(int lastX, int lastY, int currX, int currY)
     {
     }
 
@@ -297,11 +296,11 @@ public class FScroller
         /**
          * 调用{@link FScroller#computeScrollOffset()}后触发
          *
-         * @param currX 当前x
-         * @param currY 当前y
          * @param lastX 上一次的x
          * @param lastY 上一次的y
+         * @param currX 当前x
+         * @param currY 当前y
          */
-        void onScroll(int currX, int currY, int lastX, int lastY);
+        void onComputeScrollOffset(int lastX, int lastY, int currX, int currY);
     }
 }
