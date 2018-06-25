@@ -1,14 +1,15 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.novoda.bintray-release'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group = 'com.github.zj565061763'
 
 android {
     compileSdkVersion 27
-
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 20180521
-        versionName "1.0.7"
+        versionCode 20180625
+        versionName "1.0.8"
     }
 
     buildTypes {
@@ -19,6 +20,7 @@ android {
     }
 
     lintOptions {
+        checkReleaseBuilds false
         abortOnError false
     }
 }
@@ -26,18 +28,35 @@ android {
 dependencies {
 }
 
-publish {
-    userOrg = 'zj565061763'
-    groupId = 'com.fanwe.android'
-    artifactId = 'gesture'
-    publishVersion = '1.0.7'
-    desc = 'android gesture library'
-    website = 'https://github.com/zj565061763/gesture'
-}
-
+// 指定编码
 tasks.withType(Javadoc) {
     options {
         encoding "UTF-8"
         charSet 'UTF-8'
+        failOnError false
     }
+}
+
+// 打包源码
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    failOnError false
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.compile
+}
+
+// 制作文档(Javadoc)
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
