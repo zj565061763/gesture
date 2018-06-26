@@ -77,7 +77,7 @@ public class FGestureManager
     private void reset(MotionEvent event)
     {
         mTagHolder.reset();
-        mCallback.onEventFinish(event, mHasConsumeEvent, getVelocityTracker());
+        mCallback.onEventFinish(mHasConsumeEvent, getVelocityTracker(), event);
         mHasConsumeEvent = false;
         releaseVelocityTracker();
     }
@@ -191,10 +191,10 @@ public class FGestureManager
         /**
          * 事件结束({@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL})
          *
-         * @param event
          * @param hasConsumeEvent 本次按下到结束的过程中{@link #onEventConsume(MotionEvent)}方法是否消费过事件
-         * @param velocityTracker
+         * @param velocityTracker 这里返回的对象还未进行速率计算，如果要获得速率需要先进行计算{@link VelocityTracker#computeCurrentVelocity(int)}
+         * @param event
          */
-        public abstract void onEventFinish(MotionEvent event, boolean hasConsumeEvent, VelocityTracker velocityTracker);
+        public abstract void onEventFinish(boolean hasConsumeEvent, VelocityTracker velocityTracker, MotionEvent event);
     }
 }
