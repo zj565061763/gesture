@@ -207,9 +207,9 @@ public class FScroller
         {
             if (currX != mLastX || currY != mLastY)
             {
-                onComputeScrollOffset(mLastX, mLastY, currX, currY);
+                onScroll(mLastX, mLastY, currX, currY);
                 if (mCallback != null)
-                    mCallback.onComputeScrollOffset(mLastX, mLastY, currX, currY);
+                    mCallback.onScroll(mLastX, mLastY, currX, currY);
             }
         }
 
@@ -259,7 +259,7 @@ public class FScroller
      * @param currX 当前x
      * @param currY 当前y
      */
-    protected void onComputeScrollOffset(int lastX, int lastY, int currX, int currY)
+    protected void onScroll(int lastX, int lastY, int currX, int currY)
     {
     }
 
@@ -301,6 +301,6 @@ public class FScroller
          * @param currX 当前x
          * @param currY 当前y
          */
-        void onComputeScrollOffset(int lastX, int lastY, int currX, int currY);
+        void onScroll(int lastX, int lastY, int currX, int currY);
     }
 }
