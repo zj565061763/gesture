@@ -1,23 +1,23 @@
-package com.fanwe.gesture.test;
+package com.sd.gesture.test;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.FrameLayout;
 
-public class FirstFrameLayout extends FrameLayout
+public class SecondFrameLayout extends FrameLayout
 {
-    public FirstFrameLayout(Context context)
+    public SecondFrameLayout(Context context)
     {
         super(context);
     }
 
-    public FirstFrameLayout(Context context, AttributeSet attrs)
+    public SecondFrameLayout(Context context, AttributeSet attrs)
     {
         super(context, attrs);
     }
 
-    public FirstFrameLayout(Context context, AttributeSet attrs, int defStyleAttr)
+    public SecondFrameLayout(Context context, AttributeSet attrs, int defStyleAttr)
     {
         super(context, attrs, defStyleAttr);
     }
@@ -26,7 +26,7 @@ public class FirstFrameLayout extends FrameLayout
     public boolean onInterceptTouchEvent(MotionEvent ev)
     {
         boolean result = super.onInterceptTouchEvent(ev);
-        EventLogger.e("First onInterceptTouchEvent " + result, ev);
+        EventLogger.e("Second onInterceptTouchEvent " + result, ev);
         return result;
     }
 
@@ -34,7 +34,7 @@ public class FirstFrameLayout extends FrameLayout
     public boolean onTouchEvent(MotionEvent event)
     {
         boolean result = super.onTouchEvent(event);
-        EventLogger.i("First onTouchEvent " + result, event);
+        EventLogger.i("Second onTouchEvent " + result, event);
         return result;
     }
 }

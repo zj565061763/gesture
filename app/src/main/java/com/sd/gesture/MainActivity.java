@@ -1,4 +1,4 @@
-package com.fanwe.gesture;
+package com.sd.gesture;
 
 import android.content.Intent;
 import android.os.Bundle;

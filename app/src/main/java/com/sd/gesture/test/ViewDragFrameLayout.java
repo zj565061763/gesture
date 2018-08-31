@@ -1,4 +1,4 @@
-package com.fanwe.gesture.test;
+package com.sd.gesture.test;
 
 import android.content.Context;
 import android.support.v4.view.ViewCompat;
@@ -11,9 +11,9 @@ import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 import android.widget.Scroller;
 
-import com.fanwe.lib.gesture.FGestureManager;
-import com.fanwe.lib.gesture.FScroller;
-import com.fanwe.lib.gesture.FTouchHelper;
+import com.sd.lib.gesture.FGestureManager;
+import com.sd.lib.gesture.FScroller;
+import com.sd.lib.gesture.FTouchHelper;
 
 import java.util.List;
 
@@ -149,7 +149,7 @@ public class ViewDragFrameLayout extends FrameLayout
                 }
 
                 @Override
-                public void onEventFinish(MotionEvent event, boolean hasConsumeEvent, VelocityTracker velocityTracker)
+                public void onEventFinish(boolean hasConsumeEvent, VelocityTracker velocityTracker, MotionEvent event)
                 {
                     if (hasConsumeEvent)
                     {

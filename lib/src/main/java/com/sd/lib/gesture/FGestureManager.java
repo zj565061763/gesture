@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.fanwe.lib.gesture;
+package com.sd.lib.gesture;
 
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 
-import com.fanwe.lib.gesture.tag.FTagHolder;
-import com.fanwe.lib.gesture.tag.TagHolder;
+import com.sd.lib.gesture.tag.FTagHolder;
+import com.sd.lib.gesture.tag.TagHolder;
 
 public class FGestureManager
 {
