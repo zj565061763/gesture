@@ -1,7 +1,6 @@
 package com.sd.lib.gesture;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -16,8 +15,6 @@ import java.util.List;
  */
 public class FTouchHelper
 {
-    private boolean mIsDebug;
-
     private float mCurrentX;
     private float mCurrentY;
 
@@ -27,10 +24,7 @@ public class FTouchHelper
     private float mDownX;
     private float mDownY;
 
-    public void setDebug(boolean debug)
-    {
-        mIsDebug = debug;
-    }
+    private Direction mDirection = Direction.None;
 
     /**
      * 处理触摸事件
@@ -46,16 +40,18 @@ public class FTouchHelper
         mCurrentY = ev.getRawY();
 
         final int aciton = ev.getAction();
-        if (aciton == MotionEvent.ACTION_DOWN)
+        switch (aciton)
         {
-            mDownX = mCurrentX;
-            mDownY = mCurrentY;
-        }
-
-        if (mIsDebug)
-        {
-            StringBuilder sb = getDebugInfo();
-            Log.i(getClass().getSimpleName(), "event " + ev.getAction() + ":" + sb.toString());
+            case MotionEvent.ACTION_DOWN:
+                mDownX = mCurrentX;
+                mDownY = mCurrentY;
+                break;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                setDirection(Direction.None);
+                break;
+            default:
+                break;
         }
     }
 
@@ -200,6 +196,116 @@ public class FTouchHelper
 
     //---------- Degree End ----------
 
+    //---------- Direction Start ----------
+
+    /**
+     * 保存当前移动方向
+     *
+     * @param touchSlop 最小移动距离
+     * @return
+     */
+    public boolean saveDirection(final int touchSlop)
+    {
+        if (mDirection != Direction.None)
+            return false;
+
+        final float dx = getDeltaXFromDown();
+        final float dy = getDeltaYFromDown();
+
+        final float dxAbs = Math.abs(dx);
+        final float dyAbs = Math.abs(dy);
+
+        final float deltaMax = Math.max(dxAbs, dyAbs);
+        if (deltaMax == 0 || deltaMax < touchSlop)
+            return false;
+
+        if (dxAbs > dyAbs)
+        {
+            // horizontal
+            if (dx < 0)
+                setDirection(Direction.MoveLeft);
+            else
+                setDirection(Direction.MoveRight);
+        } else
+        {
+            // vertical
+            if (dy < 0)
+                setDirection(Direction.MoveTop);
+            else
+                setDirection(Direction.MoveBottom);
+        }
+
+        return true;
+    }
+
+    /**
+     * 保存水平方向
+     *
+     * @param touchSlop 最小移动距离
+     * @return
+     */
+    public boolean saveDirectionHorizontal(final int touchSlop)
+    {
+        if (mDirection == Direction.MoveLeft || mDirection == Direction.MoveRight)
+            return false;
+
+        final float dx = getDeltaXFromDown();
+        if (dx == 0)
+            return false;
+
+        if (Math.abs(dx) < touchSlop)
+            return false;
+
+        if (dx < 0)
+            setDirection(Direction.MoveLeft);
+        else
+            setDirection(Direction.MoveRight);
+
+        return true;
+    }
+
+    /**
+     * 保存竖直方向
+     *
+     * @param touchSlop 最小移动距离
+     * @return
+     */
+    public boolean saveDirectionVertical(final int touchSlop)
+    {
+        if (mDirection == Direction.MoveTop || mDirection == Direction.MoveBottom)
+            return false;
+
+        final float dy = getDeltaYFromDown();
+        if (dy == 0)
+            return false;
+
+        if (Math.abs(dy) < touchSlop)
+            return false;
+
+        if (dy < 0)
+            setDirection(Direction.MoveTop);
+        else
+            setDirection(Direction.MoveBottom);
+
+        return true;
+    }
+
+    private void setDirection(Direction direction)
+    {
+        mDirection = direction;
+    }
+
+    /**
+     * 返回已保存的移动方向
+     *
+     * @return
+     */
+    public Direction getDirection()
+    {
+        return mDirection;
+    }
+
+    //---------- Direction End ----------
 
     /**
      * 是否是点击事件
@@ -439,7 +545,7 @@ public class FTouchHelper
 
     public StringBuilder getDebugInfo()
     {
-        StringBuilder sb = new StringBuilder("\r\n")
+        final StringBuilder sb = new StringBuilder("\r\n")
                 .append("Down:").append(mDownX).append(",").append(mDownY).append("\r\n")
                 .append("Current:").append(mCurrentX).append(",").append(mCurrentY).append("\r\n")
 
@@ -449,5 +555,14 @@ public class FTouchHelper
                 .append("Degree from down:").append(getDegreeXFromDown()).append(",").append(getDegreeYFromDown()).append("\r\n")
                 .append("Degree from last:").append(getDegreeX()).append(",").append(getDegreeY()).append("\r\n");
         return sb;
+    }
+
+    public enum Direction
+    {
+        None,
+        MoveLeft,
+        MoveTop,
+        MoveRight,
+        MoveBottom
     }
 }
