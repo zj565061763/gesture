@@ -45,9 +45,6 @@ public class FTouchHelper
             case MotionEvent.ACTION_DOWN:
                 mDownX = mCurrentX;
                 mDownY = mCurrentY;
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
                 setDirection(Direction.None);
                 break;
             default:
