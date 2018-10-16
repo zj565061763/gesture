@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.Scroller;
 
@@ -163,7 +164,6 @@ public class ViewDragFrameLayout extends FrameLayout
                     }
                 }
             });
-            mGestureManager.getTouchHelper().setDebug(true);
         }
         return mGestureManager;
     }
@@ -191,8 +191,8 @@ public class ViewDragFrameLayout extends FrameLayout
 
     private void offsetLeftAndRightLegal(View view, int delta)
     {
-        final int min = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
-        final int max = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
+        final int min = getLeftAlignParentLeft(this, mChild, true);
+        final int max = getLeftAlignParentRight(this, mChild, true);
 
         delta = FTouchHelper.getLegalDelta(view.getLeft(), min, max, delta);
         ViewCompat.offsetLeftAndRight(view, delta);
@@ -200,8 +200,8 @@ public class ViewDragFrameLayout extends FrameLayout
 
     private void offsetTopAndBottomLegal(View view, int delta)
     {
-        final int min = FTouchHelper.getTopAlignParentTop(this, mChild, true);
-        final int max = FTouchHelper.getTopAlignParentBottom(this, mChild, true);
+        final int min = getTopAlignParentTop(this, mChild, true);
+        final int max = getTopAlignParentBottom(this, mChild, true);
 
         delta = FTouchHelper.getLegalDelta(view.getTop(), min, max, delta);
         ViewCompat.offsetTopAndBottom(view, delta);
@@ -211,8 +211,8 @@ public class ViewDragFrameLayout extends FrameLayout
     {
         final int startX = mChild.getLeft();
 
-        final int alignLeft = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
-        final int alignRight = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
+        final int alignLeft = getLeftAlignParentLeft(this, mChild, true);
+        final int alignRight = getLeftAlignParentRight(this, mChild, true);
 
         final int endX = startX < (alignLeft + alignRight) / 2 ? alignLeft : alignRight;
 
@@ -233,17 +233,90 @@ public class ViewDragFrameLayout extends FrameLayout
         final int velocityX = (int) velocityTracker.getXVelocity();
         final int velocityY = (int) velocityTracker.getYVelocity();
 
-        final int minX = FTouchHelper.getLeftAlignParentLeft(this, mChild, true);
-        final int maxX = FTouchHelper.getLeftAlignParentRight(this, mChild, true);
+        final int minX = getLeftAlignParentLeft(this, mChild, true);
+        final int maxX = getLeftAlignParentRight(this, mChild, true);
 
-        final int minY = FTouchHelper.getTopAlignParentTop(this, mChild, true);
-        final int maxY = FTouchHelper.getTopAlignParentBottom(this, mChild, true);
+        final int minY = getTopAlignParentTop(this, mChild, true);
+        final int maxY = getTopAlignParentBottom(this, mChild, true);
 
         final boolean fling = getScroller().fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
         if (fling)
         {
             invalidate();
         }
+    }
+
+
+    /**
+     * 返回child和parent左边对齐时候，child的left
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
+    public static int getLeftAlignParentLeft(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getPaddingLeft();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align += ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).leftMargin;
+        }
+        return align;
+    }
+
+    /**
+     * 返回child和parent右边对齐时候，child的left
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
+    public static int getLeftAlignParentRight(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getWidth() - parent.getPaddingRight() - child.getWidth();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align -= ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).rightMargin;
+        }
+        return align;
+    }
+
+    /**
+     * 返回child和parent顶部对齐时候，child的top
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
+    public static int getTopAlignParentTop(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getPaddingTop();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align += ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).topMargin;
+        }
+        return align;
+    }
+
+    /**
+     * 返回child和parent底部对齐时候，child的top
+     *
+     * @param parent
+     * @param child
+     * @param margin
+     * @return
+     */
+    public static int getTopAlignParentBottom(ViewGroup parent, View child, boolean margin)
+    {
+        int align = parent.getHeight() - parent.getPaddingTop() - child.getHeight();
+        if (margin && child.getLayoutParams() instanceof ViewGroup.MarginLayoutParams)
+        {
+            align -= ((ViewGroup.MarginLayoutParams) child.getLayoutParams()).bottomMargin;
+        }
+        return align;
     }
 
     @Override
