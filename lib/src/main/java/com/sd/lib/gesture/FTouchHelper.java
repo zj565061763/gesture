@@ -399,7 +399,7 @@ public class FTouchHelper
     }
 
     /**
-     * 找到parent中处于指定坐标下最顶部的child
+     * 找到parent中处于指定坐标下的child
      *
      * @param parent
      * @param x
