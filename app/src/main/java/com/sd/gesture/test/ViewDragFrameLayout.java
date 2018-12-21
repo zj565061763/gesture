@@ -10,11 +10,11 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.Scroller;
 
 import com.sd.lib.gesture.FGestureManager;
-import com.sd.lib.gesture.FScroller;
 import com.sd.lib.gesture.FTouchHelper;
+import com.sd.lib.gesture.scroller.FScroller;
+import com.sd.lib.gesture.scroller.SimpleScrollerApi;
 
 import java.util.List;
 
@@ -58,7 +58,7 @@ public class ViewDragFrameLayout extends FrameLayout
     {
         if (mScroller == null)
         {
-            mScroller = new FScroller(new Scroller(getContext()));
+            mScroller = new FScroller(new SimpleScrollerApi(getContext()));
             mScroller.setCallback(new FScroller.Callback()
             {
                 @Override

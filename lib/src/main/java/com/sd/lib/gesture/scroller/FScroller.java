@@ -1,13 +1,11 @@
-package com.sd.lib.gesture;
-
-import android.widget.Scroller;
+package com.sd.lib.gesture.scroller;
 
 /**
  * 滚动帮助类
  */
 public class FScroller
 {
-    private final Scroller mScroller;
+    private final ScrollerApi mScrollerApi;
     /**
      * 最大滚动距离
      */
@@ -27,12 +25,12 @@ public class FScroller
 
     private Callback mCallback;
 
-    public FScroller(Scroller scroller)
+    public FScroller(ScrollerApi scrollerApi)
     {
-        if (scroller == null)
-            throw new NullPointerException("scroller is null");
+        if (scrollerApi == null)
+            throw new NullPointerException();
 
-        mScroller = scroller;
+        mScrollerApi = scrollerApi;
     }
 
     /**
@@ -141,7 +139,7 @@ public class FScroller
             if (duration < 0)
                 duration = computeDuration(dx, dy, mMaxScrollDistance, mMaxScrollDuration, mMinScrollDuration);
 
-            mScroller.startScroll(startX, startY, dx, dy, duration);
+            mScrollerApi.startScroll(startX, startY, dx, dy, duration);
             updateFinished();
         }
         return scroll;
@@ -170,7 +168,7 @@ public class FScroller
             mLastX = startX;
             mLastY = startY;
 
-            mScroller.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
+            mScrollerApi.fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
             updateFinished();
         }
         return fling;
@@ -183,10 +181,10 @@ public class FScroller
      */
     public final boolean computeScrollOffset()
     {
-        final boolean compute = mScroller.computeScrollOffset();
+        final boolean compute = mScrollerApi.computeScrollOffset();
 
-        final int currX = mScroller.getCurrX();
-        final int currY = mScroller.getCurrY();
+        final int currX = mScrollerApi.getCurrX();
+        final int currY = mScrollerApi.getCurrY();
 
         if (compute)
         {
@@ -210,13 +208,13 @@ public class FScroller
      */
     public final void abortAnimation()
     {
-        mScroller.abortAnimation();
+        mScrollerApi.abortAnimation();
         updateFinished();
     }
 
     private void updateFinished()
     {
-        final boolean finish = mScroller.isFinished();
+        final boolean finish = mScrollerApi.isFinished();
         if (mIsFinished != finish)
         {
             mIsFinished = finish;
@@ -287,5 +285,22 @@ public class FScroller
          * @param currY 当前y
          */
         void onScroll(int lastX, int lastY, int currX, int currY);
+    }
+
+    public interface ScrollerApi
+    {
+        void startScroll(int startX, int startY, int dx, int dy, int duration);
+
+        void fling(int startX, int startY, int velocityX, int velocityY, int minX, int maxX, int minY, int maxY);
+
+        boolean computeScrollOffset();
+
+        void abortAnimation();
+
+        boolean isFinished();
+
+        int getCurrX();
+
+        int getCurrY();
     }
 }
