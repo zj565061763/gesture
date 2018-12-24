@@ -13,7 +13,7 @@ import android.widget.FrameLayout;
 
 import com.sd.lib.gesture.FGestureManager;
 import com.sd.lib.gesture.FTouchHelper;
-import com.sd.lib.gesture.scroller.FScroller;
+import com.sd.lib.gesture.FScroller;
 
 import java.util.List;
 
