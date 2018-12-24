@@ -59,14 +59,6 @@ public class FGestureManager
         }
     }
 
-    private void reset(MotionEvent event)
-    {
-        mTagHolder.reset();
-        mCallback.onEventFinish(mHasConsumeEvent, getVelocityTracker(), event);
-        mHasConsumeEvent = false;
-        releaseVelocityTracker();
-    }
-
     /**
      * 外部调用
      *
@@ -78,18 +70,21 @@ public class FGestureManager
         mTouchHelper.processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
-        switch (event.getAction())
+        boolean tagIntercept = false;
+
+        final int action = event.getAction();
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)
         {
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                reset(event);
-                break;
-            default:
-                if (mCallback.shouldInterceptEvent(event))
-                    mTagHolder.setTagIntercept(true);
-                break;
+            onEventFinish(event);
+        } else
+        {
+            if (action == MotionEvent.ACTION_DOWN)
+                onEventStart(event);
+
+            tagIntercept = mCallback.shouldInterceptEvent(event);
         }
 
+        mTagHolder.setTagIntercept(tagIntercept);
         return mTagHolder.isTagIntercept();
     }
 
@@ -104,31 +99,48 @@ public class FGestureManager
         mTouchHelper.processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
-        switch (event.getAction())
-        {
-            case MotionEvent.ACTION_DOWN:
-                return mCallback.onEventActionDown(event);
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                reset(event);
-                break;
-            default:
-                if (mTagHolder.isTagConsume())
-                {
-                    final boolean consume = mCallback.onEventConsume(event);
-                    mTagHolder.setTagConsume(consume);
+        boolean tagConsume = false;
 
-                    // 标识消费过事件
-                    if (consume)
-                        mHasConsumeEvent = true;
-                } else
-                {
-                    mTagHolder.setTagConsume(mCallback.shouldConsumeEvent(event));
-                }
-                break;
+        final int action = event.getAction();
+        if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)
+        {
+            onEventFinish(event);
+        } else if (action == MotionEvent.ACTION_DOWN)
+        {
+            onEventStart(event);
+            return mCallback.onEventActionDown(event);
+        } else
+        {
+            if (mTagHolder.isTagConsume())
+            {
+                final boolean consume = mCallback.onEventConsume(event);
+
+                // 标识消费过事件
+                if (consume)
+                    mHasConsumeEvent = true;
+
+                tagConsume = consume;
+            } else
+            {
+                tagConsume = mCallback.shouldConsumeEvent(event);
+            }
         }
 
+        mTagHolder.setTagConsume(tagConsume);
         return mTagHolder.isTagConsume();
+    }
+
+    private void onEventStart(MotionEvent event)
+    {
+
+    }
+
+    private void onEventFinish(MotionEvent event)
+    {
+        mTagHolder.reset();
+        mCallback.onEventFinish(mHasConsumeEvent, getVelocityTracker(), event);
+        mHasConsumeEvent = false;
+        releaseVelocityTracker();
     }
 
     public abstract static class Callback
