@@ -66,8 +66,11 @@ public class FGestureManager
      */
     public void setCancelTouchEvent()
     {
-        mIsCancelTouchEvent = true;
-        mTagHolder.reset();
+        if (mTagHolder.isTagConsume() || mTagHolder.isTagIntercept())
+        {
+            mIsCancelTouchEvent = true;
+            mTagHolder.reset();
+        }
     }
 
     /**
@@ -239,7 +242,6 @@ public class FGestureManager
          */
         public void onEventFinish(FinishParams params, VelocityTracker velocityTracker, MotionEvent event)
         {
-
         }
     }
 }
