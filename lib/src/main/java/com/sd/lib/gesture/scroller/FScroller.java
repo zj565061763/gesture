@@ -1,5 +1,8 @@
 package com.sd.lib.gesture.scroller;
 
+import android.content.Context;
+import android.view.animation.Interpolator;
+
 /**
  * 滚动帮助类
  */
@@ -24,6 +27,16 @@ public class FScroller
     private boolean mIsFinished = true;
 
     private Callback mCallback;
+
+    public FScroller(Context context)
+    {
+        this(new SimpleScrollerApi(context));
+    }
+
+    public FScroller(Context context, Interpolator interpolator)
+    {
+        this(new SimpleScrollerApi(context, interpolator));
+    }
 
     public FScroller(ScrollerApi scrollerApi)
     {
