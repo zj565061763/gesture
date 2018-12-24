@@ -156,6 +156,7 @@ public class FGestureManager
     {
         mTagHolder.reset();
 
+        mCallback.onEventFinish(mHasConsumeEvent, getVelocityTracker(), event);
         final FinishParams params = new FinishParams(mHasConsumeEvent, mIsCancelTouchEvent);
         mCallback.onEventFinish(params, getVelocityTracker(), event);
 
@@ -225,7 +226,9 @@ public class FGestureManager
         public abstract boolean onEventConsume(MotionEvent event);
 
         @Deprecated
-        public abstract void onEventFinish(boolean hasConsumeEvent, VelocityTracker velocityTracker, MotionEvent event);
+        public void onEventFinish(boolean hasConsumeEvent, VelocityTracker velocityTracker, MotionEvent event)
+        {
+        }
 
         /**
          * 事件结束，收到{@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}事件
@@ -236,7 +239,7 @@ public class FGestureManager
          */
         public void onEventFinish(FinishParams params, VelocityTracker velocityTracker, MotionEvent event)
         {
-            onEventFinish(params.hasConsumeEvent, velocityTracker, event);
+
         }
     }
 }
