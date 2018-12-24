@@ -63,12 +63,11 @@ public class FGestureManager
 
     /**
      * 设置取消触摸事件
-     *
-     * @param cancel
      */
-    public void setCancelTouchEvent(boolean cancel)
+    public void setCancelTouchEvent()
     {
-        mCancelTouchEvent = cancel;
+        mCancelTouchEvent = true;
+        mTagHolder.reset();
     }
 
     /**
