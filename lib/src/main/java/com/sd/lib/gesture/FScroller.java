@@ -27,6 +27,8 @@ public class FScroller
     private int mLastY;
     private boolean mIsFinished = true;
 
+    private boolean mIsAbort = false;
+
     private Callback mCallback;
 
     public FScroller(Context context)
@@ -53,11 +55,7 @@ public class FScroller
         mScrollerApi = scrollerApi;
     }
 
-    /**
-     * 设置回调
-     *
-     * @param callback
-     */
+    @Deprecated
     public final void setCallback(Callback callback)
     {
         mCallback = callback;
@@ -70,10 +68,6 @@ public class FScroller
      */
     public final boolean isFinished()
     {
-        /**
-         * 这里直接返回当前对象保存的属性
-         * 如果返回{@link FScroller#isFinished()}方法的返回值，则在通知{@link Callback#onScroll(int, int)}方法的时候，调用是否结束方法有可能返回true
-         */
         return mIsFinished;
     }
 
@@ -210,6 +204,7 @@ public class FScroller
         {
             if (currX != mLastX || currY != mLastY)
             {
+                onScrollCompute(mLastX, mLastY, currX, currY);
                 onScroll(mLastX, mLastY, currX, currY);
                 if (mCallback != null)
                     mCallback.onScroll(mLastX, mLastY, currX, currY);
@@ -229,7 +224,10 @@ public class FScroller
     public final void abortAnimation()
     {
         mScrollerApi.abortAnimation();
+
+        mIsAbort = true;
         updateFinished();
+        mIsAbort = false;
     }
 
     private void updateFinished()
@@ -239,6 +237,11 @@ public class FScroller
         {
             mIsFinished = finish;
 
+            if (finish)
+                onScrollFinish(mIsAbort);
+            else
+                onScrollStart();
+
             onScrollStateChanged(finish);
             if (mCallback != null)
                 mCallback.onScrollStateChanged(finish);
@@ -246,25 +249,43 @@ public class FScroller
     }
 
     /**
-     * 滚动状态变化回调
-     *
-     * @param isFinished true-滚动结束，false-滚动中
+     * 滚动开始回调
      */
-    protected void onScrollStateChanged(boolean isFinished)
+    protected void onScrollStart()
     {
     }
 
     /**
-     * 调用{@link FScroller#computeScrollOffset()}后触发
+     * 调用{@link FScroller#computeScrollOffset()}回调
      *
      * @param lastX 上一次的x
      * @param lastY 上一次的y
      * @param currX 当前x
      * @param currY 当前y
      */
+    protected void onScrollCompute(int lastX, int lastY, int currX, int currY)
+    {
+    }
+
+    /**
+     * 滚动结束回调
+     *
+     * @param isAbort
+     */
+    protected void onScrollFinish(boolean isAbort)
+    {
+    }
+
+    @Deprecated
+    protected void onScrollStateChanged(boolean isFinished)
+    {
+    }
+
+    @Deprecated
     protected void onScroll(int lastX, int lastY, int currX, int currY)
     {
     }
+
 
     /**
      * 计算时长
@@ -287,6 +308,7 @@ public class FScroller
         return Math.min(duration, maxDuration);
     }
 
+    @Deprecated
     public interface Callback
     {
         /**
