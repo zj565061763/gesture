@@ -39,6 +39,12 @@ public class FScroller
         this(new SimpleScrollerApi(context, interpolator));
     }
 
+    @Deprecated
+    public FScroller(Scroller scroller)
+    {
+        this(new SimpleScrollerApi(scroller));
+    }
+
     public FScroller(ScrollerApi scrollerApi)
     {
         if (scrollerApi == null)
@@ -330,6 +336,14 @@ public class FScroller
         public SimpleScrollerApi(Context context, Interpolator interpolator)
         {
             mScroller = new Scroller(context, interpolator);
+        }
+
+        @Deprecated
+        public SimpleScrollerApi(Scroller scroller)
+        {
+            if (scroller == null)
+                throw new NullPointerException("scroller is null");
+            mScroller = scroller;
         }
 
         @Override
