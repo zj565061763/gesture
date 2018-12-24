@@ -27,8 +27,6 @@ public class FScroller
     private int mLastY;
     private boolean mIsFinished = true;
 
-    private boolean mIsAbort = false;
-
     private Callback mCallback;
 
     public FScroller(Context context)
@@ -223,13 +221,15 @@ public class FScroller
     public final void abortAnimation()
     {
         mScrollerApi.abortAnimation();
-
-        mIsAbort = true;
-        updateFinished();
-        mIsAbort = false;
+        updateFinished(true);
     }
 
     private void updateFinished()
+    {
+        updateFinished(false);
+    }
+
+    private void updateFinished(boolean isAbort)
     {
         final boolean finish = mScrollerApi.isFinished();
         if (mIsFinished != finish)
@@ -237,7 +237,7 @@ public class FScroller
             mIsFinished = finish;
 
             if (finish)
-                onScrollFinish(mIsAbort);
+                onScrollFinish(isAbort);
             else
                 onScrollStart();
 
