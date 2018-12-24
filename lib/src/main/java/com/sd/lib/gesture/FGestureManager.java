@@ -12,7 +12,9 @@ public class FGestureManager
     private final FTagHolder mTagHolder = new FTagHolder();
 
     private VelocityTracker mVelocityTracker;
-    private boolean mHasConsumeEvent;
+    private boolean mHasConsumeEvent = false;
+
+    private boolean mCancelTouchEvent = false;
 
     private final Callback mCallback;
 
@@ -60,6 +62,16 @@ public class FGestureManager
     }
 
     /**
+     * 设置取消触摸事件
+     *
+     * @param cancel
+     */
+    public void setCancelTouchEvent(boolean cancel)
+    {
+        mCancelTouchEvent = cancel;
+    }
+
+    /**
      * 外部调用
      *
      * @param event
@@ -83,6 +95,9 @@ public class FGestureManager
 
             tagIntercept = mCallback.shouldInterceptEvent(event);
         }
+
+        if (mCancelTouchEvent)
+            tagIntercept = false;
 
         mTagHolder.setTagIntercept(tagIntercept);
         return mTagHolder.isTagIntercept();
@@ -126,13 +141,16 @@ public class FGestureManager
             }
         }
 
+        if (mCancelTouchEvent)
+            tagConsume = false;
+
         mTagHolder.setTagConsume(tagConsume);
         return mTagHolder.isTagConsume();
     }
 
     private void onEventStart(MotionEvent event)
     {
-
+        mCancelTouchEvent = false;
     }
 
     private void onEventFinish(MotionEvent event)
