@@ -14,7 +14,7 @@ public class FGestureManager
     private VelocityTracker mVelocityTracker;
     private boolean mHasConsumeEvent = false;
 
-    private boolean mCancelTouchEvent = false;
+    private boolean mIsCancelTouchEvent = false;
 
     private final Callback mCallback;
 
@@ -66,7 +66,7 @@ public class FGestureManager
      */
     public void setCancelTouchEvent()
     {
-        mCancelTouchEvent = true;
+        mIsCancelTouchEvent = true;
         mTagHolder.reset();
     }
 
@@ -95,7 +95,7 @@ public class FGestureManager
             tagIntercept = mCallback.shouldInterceptEvent(event);
         }
 
-        if (mCancelTouchEvent)
+        if (mIsCancelTouchEvent)
             tagIntercept = false;
 
         mTagHolder.setTagIntercept(tagIntercept);
@@ -140,7 +140,7 @@ public class FGestureManager
             }
         }
 
-        if (mCancelTouchEvent)
+        if (mIsCancelTouchEvent)
             tagConsume = false;
 
         mTagHolder.setTagConsume(tagConsume);
@@ -149,15 +149,37 @@ public class FGestureManager
 
     private void onEventStart(MotionEvent event)
     {
-        mCancelTouchEvent = false;
+
     }
 
     private void onEventFinish(MotionEvent event)
     {
         mTagHolder.reset();
-        mCallback.onEventFinish(mHasConsumeEvent, getVelocityTracker(), event);
+
+        final FinishParams params = new FinishParams(mHasConsumeEvent, mIsCancelTouchEvent);
+        mCallback.onEventFinish(params, getVelocityTracker(), event);
+
         mHasConsumeEvent = false;
+        mIsCancelTouchEvent = false;
         releaseVelocityTracker();
+    }
+
+    public static class FinishParams
+    {
+        /**
+         * 本次按下到结束的过程中{@link Callback#onEventConsume(MotionEvent)}方法是否消费过事件
+         */
+        public final boolean hasConsumeEvent;
+        /**
+         * 本次按下到结束的过程中是否调用过{@link #setCancelTouchEvent()}方法，取消事件
+         */
+        public final boolean isCancelTouchEvent;
+
+        public FinishParams(boolean hasConsumeEvent, boolean isCancelTouchEvent)
+        {
+            this.hasConsumeEvent = hasConsumeEvent;
+            this.isCancelTouchEvent = isCancelTouchEvent;
+        }
     }
 
     public abstract static class Callback
@@ -202,13 +224,19 @@ public class FGestureManager
          */
         public abstract boolean onEventConsume(MotionEvent event);
 
-        /**
-         * 事件结束({@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL})
-         *
-         * @param hasConsumeEvent 本次按下到结束的过程中{@link #onEventConsume(MotionEvent)}方法是否消费过事件
-         * @param velocityTracker 这里返回的对象还未进行速率计算，如果要获得速率需要先进行计算{@link VelocityTracker#computeCurrentVelocity(int)}
-         * @param event
-         */
+        @Deprecated
         public abstract void onEventFinish(boolean hasConsumeEvent, VelocityTracker velocityTracker, MotionEvent event);
+
+        /**
+         * 事件结束，收到{@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}事件
+         *
+         * @param params          {@link FinishParams}
+         * @param velocityTracker 速率计算对象，这里返回的对象还未进行速率计算，如果要获得速率需要先进行计算{@link VelocityTracker#computeCurrentVelocity(int)}
+         * @param event           {@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}
+         */
+        public void onEventFinish(FinishParams params, VelocityTracker velocityTracker, MotionEvent event)
+        {
+            onEventFinish(params.hasConsumeEvent, velocityTracker, event);
+        }
     }
 }
