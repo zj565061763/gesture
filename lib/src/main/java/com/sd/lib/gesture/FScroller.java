@@ -205,7 +205,6 @@ public class FScroller
             if (currX != mLastX || currY != mLastY)
             {
                 onScrollCompute(mLastX, mLastY, currX, currY);
-                onScroll(mLastX, mLastY, currX, currY);
                 if (mCallback != null)
                     mCallback.onScroll(mLastX, mLastY, currX, currY);
             }
@@ -242,7 +241,6 @@ public class FScroller
             else
                 onScrollStart();
 
-            onScrollStateChanged(finish);
             if (mCallback != null)
                 mCallback.onScrollStateChanged(finish);
         }
@@ -275,17 +273,6 @@ public class FScroller
     protected void onScrollFinish(boolean isAbort)
     {
     }
-
-    @Deprecated
-    protected void onScrollStateChanged(boolean isFinished)
-    {
-    }
-
-    @Deprecated
-    protected void onScroll(int lastX, int lastY, int currX, int currY)
-    {
-    }
-
 
     /**
      * 计算时长
