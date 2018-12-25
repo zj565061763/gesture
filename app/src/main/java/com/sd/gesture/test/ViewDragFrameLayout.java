@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.sd.lib.gesture.FGestureManager;
-import com.sd.lib.gesture.FTouchHelper;
 import com.sd.lib.gesture.FScroller;
+import com.sd.lib.gesture.FTouchHelper;
 
 import java.util.List;
 
@@ -57,32 +57,34 @@ public class ViewDragFrameLayout extends FrameLayout
     {
         if (mScroller == null)
         {
-            mScroller = new FScroller(getContext());
-            mScroller.setCallback(new FScroller.Callback()
+            mScroller = new FScroller(getContext())
             {
                 @Override
-                public void onScrollStateChanged(boolean isFinished)
+                protected void onScrollStart()
                 {
-                    Log.e(TAG, "onScrollStateChanged isFinished:" + isFinished);
-
-                    if (isFinished)
-                    {
-                        setChild(null);
-                    }
+                    Log.i(TAG, "onScrollStart");
                 }
 
                 @Override
-                public void onScroll(int lastX, int lastY, int currX, int currY)
+                protected void onScrollCompute(int lastX, int lastY, int currX, int currY)
                 {
                     final int dx = currX - lastX;
                     final int dy = currY - lastY;
 
+                    Log.i(TAG, "onScrollCompute:" + dx + "," + dy);
+
                     offsetLeftAndRightLegal(mChild, dx);
                     offsetTopAndBottomLegal(mChild, dy);
-
-                    Log.i(TAG, "onScroll:" + dx + "," + dy);
                 }
-            });
+
+                @Override
+                protected void onScrollFinish(boolean isAbort)
+                {
+                    Log.i(TAG, "onScrollFinish isAbort:" + isAbort);
+
+                    setChild(null);
+                }
+            };
         }
         return mScroller;
     }
@@ -149,9 +151,9 @@ public class ViewDragFrameLayout extends FrameLayout
                 }
 
                 @Override
-                public void onEventFinish(boolean hasConsumeEvent, VelocityTracker velocityTracker, MotionEvent event)
+                public void onEventFinish(FGestureManager.FinishParams params, VelocityTracker velocityTracker, MotionEvent event)
                 {
-                    if (hasConsumeEvent)
+                    if (params.hasConsumeEvent)
                     {
                         doScroll();
                     } else

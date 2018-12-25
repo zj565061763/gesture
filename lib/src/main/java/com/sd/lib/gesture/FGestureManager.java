@@ -3,17 +3,14 @@ package com.sd.lib.gesture;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 
-import com.sd.lib.gesture.tag.FTagHolder;
-import com.sd.lib.gesture.tag.TagHolder;
-
 public class FGestureManager
 {
     private final FTouchHelper mTouchHelper = new FTouchHelper();
     private final FTagHolder mTagHolder = new FTagHolder();
 
     private VelocityTracker mVelocityTracker;
-    private boolean mHasConsumeEvent = false;
 
+    private boolean mHasConsumeEvent = false;
     private boolean mIsCancelTouchEvent = false;
 
     private final Callback mCallback;
@@ -40,7 +37,7 @@ public class FGestureManager
      *
      * @return
      */
-    public TagHolder getTagHolder()
+    public FTagHolder getTagHolder()
     {
         return mTagHolder;
     }
@@ -159,7 +156,6 @@ public class FGestureManager
     {
         mTagHolder.reset();
 
-        mCallback.onEventFinish(mHasConsumeEvent, getVelocityTracker(), event);
         final FinishParams params = new FinishParams(mHasConsumeEvent, mIsCancelTouchEvent);
         mCallback.onEventFinish(params, getVelocityTracker(), event);
 
@@ -179,7 +175,7 @@ public class FGestureManager
          */
         public final boolean isCancelTouchEvent;
 
-        public FinishParams(boolean hasConsumeEvent, boolean isCancelTouchEvent)
+        private FinishParams(boolean hasConsumeEvent, boolean isCancelTouchEvent)
         {
             this.hasConsumeEvent = hasConsumeEvent;
             this.isCancelTouchEvent = isCancelTouchEvent;
@@ -228,11 +224,6 @@ public class FGestureManager
          */
         public abstract boolean onEventConsume(MotionEvent event);
 
-        @Deprecated
-        public void onEventFinish(boolean hasConsumeEvent, VelocityTracker velocityTracker, MotionEvent event)
-        {
-        }
-
         /**
          * 事件结束，收到{@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}事件
          *
@@ -240,8 +231,86 @@ public class FGestureManager
          * @param velocityTracker 速率计算对象，这里返回的对象还未进行速率计算，如果要获得速率需要先进行计算{@link VelocityTracker#computeCurrentVelocity(int)}
          * @param event           {@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}
          */
-        public void onEventFinish(FinishParams params, VelocityTracker velocityTracker, MotionEvent event)
+        public abstract void onEventFinish(FinishParams params, VelocityTracker velocityTracker, MotionEvent event);
+    }
+
+    public static class FTagHolder
+    {
+        /**
+         * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
+         */
+        private boolean mTagIntercept = false;
+        /**
+         * 是否需要消费事件标识(用于onTouchEvent方法)
+         */
+        private boolean mTagConsume = false;
+
+        private Callback mCallback;
+
+        private FTagHolder()
         {
+        }
+
+        //---------- public method start ----------
+
+        public void setCallback(Callback callback)
+        {
+            mCallback = callback;
+        }
+
+        public boolean isTagIntercept()
+        {
+            return mTagIntercept;
+        }
+
+        public boolean isTagConsume()
+        {
+            return mTagConsume;
+        }
+
+        //---------- public method end ----------
+
+        /**
+         * 设置是否需要拦截事件标识(用于onInterceptTouchEvent方法)
+         *
+         * @param tagIntercept
+         */
+        void setTagIntercept(boolean tagIntercept)
+        {
+            if (mTagIntercept != tagIntercept)
+            {
+                mTagIntercept = tagIntercept;
+                if (mCallback != null)
+                    mCallback.onTagInterceptChanged(tagIntercept);
+            }
+        }
+
+        /**
+         * 设置是否需要消费事件标识(用于onTouchEvent方法)
+         *
+         * @param tagConsume
+         */
+        void setTagConsume(boolean tagConsume)
+        {
+            if (mTagConsume != tagConsume)
+            {
+                mTagConsume = tagConsume;
+                if (mCallback != null)
+                    mCallback.onTagConsumeChanged(tagConsume);
+            }
+        }
+
+        void reset()
+        {
+            setTagIntercept(false);
+            setTagConsume(false);
+        }
+
+        public interface Callback
+        {
+            void onTagInterceptChanged(boolean tag);
+
+            void onTagConsumeChanged(boolean tag);
         }
     }
 }

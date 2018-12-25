@@ -7,7 +7,7 @@ import android.widget.Scroller;
 /**
  * 滚动帮助类
  */
-public class FScroller
+public abstract class FScroller
 {
     private final ScrollerApi mScrollerApi;
     /**
@@ -27,8 +27,6 @@ public class FScroller
     private int mLastY;
     private boolean mIsFinished = true;
 
-    private Callback mCallback;
-
     public FScroller(Context context)
     {
         this(new SimpleScrollerApi(context));
@@ -39,24 +37,12 @@ public class FScroller
         this(new SimpleScrollerApi(context, interpolator));
     }
 
-    @Deprecated
-    public FScroller(Scroller scroller)
-    {
-        this(new SimpleScrollerApi(scroller));
-    }
-
     public FScroller(ScrollerApi scrollerApi)
     {
         if (scrollerApi == null)
             throw new NullPointerException();
 
         mScrollerApi = scrollerApi;
-    }
-
-    @Deprecated
-    public final void setCallback(Callback callback)
-    {
-        mCallback = callback;
     }
 
     /**
@@ -157,20 +143,20 @@ public class FScroller
         return scroll;
     }
 
-    public boolean flingX(int startX, int velocityX, int minX, int maxX)
+    public final boolean flingX(int startX, int velocityX, int minX, int maxX)
     {
         return fling(startX, 0, velocityX, 0, minX, maxX, 0, 0);
     }
 
-    public boolean flingY(int startY, int velocityY, int minY, int maxY)
+    public final boolean flingY(int startY, int velocityY, int minY, int maxY)
     {
         return fling(0, startY, 0, velocityY, 0, 0, minY, maxY);
     }
 
-    public boolean fling(int startX, int startY,
-                         int velocityX, int velocityY,
-                         int minX, int maxX,
-                         int minY, int maxY)
+    public final boolean fling(int startX, int startY,
+                               int velocityX, int velocityY,
+                               int minX, int maxX,
+                               int minY, int maxY)
     {
         final boolean fling = (startX > minX && startX < maxX && velocityX != 0)
                 || (startY > minY && startY < maxY && velocityY != 0);
@@ -203,8 +189,6 @@ public class FScroller
             if (currX != mLastX || currY != mLastY)
             {
                 onScrollCompute(mLastX, mLastY, currX, currY);
-                if (mCallback != null)
-                    mCallback.onScroll(mLastX, mLastY, currX, currY);
             }
         }
 
@@ -240,18 +224,13 @@ public class FScroller
                 onScrollFinish(isAbort);
             else
                 onScrollStart();
-
-            if (mCallback != null)
-                mCallback.onScrollStateChanged(finish);
         }
     }
 
     /**
      * 滚动开始回调
      */
-    protected void onScrollStart()
-    {
-    }
+    protected abstract void onScrollStart();
 
     /**
      * 调用{@link FScroller#computeScrollOffset()}回调
@@ -261,18 +240,14 @@ public class FScroller
      * @param currX 当前x
      * @param currY 当前y
      */
-    protected void onScrollCompute(int lastX, int lastY, int currX, int currY)
-    {
-    }
+    protected abstract void onScrollCompute(int lastX, int lastY, int currX, int currY);
 
     /**
      * 滚动结束回调
      *
      * @param isAbort
      */
-    protected void onScrollFinish(boolean isAbort)
-    {
-    }
+    protected abstract void onScrollFinish(boolean isAbort);
 
     /**
      * 计算时长
@@ -287,33 +262,13 @@ public class FScroller
     public static int computeDuration(int dx, int dy, int maxDistance, int maxDuration, int minDuration)
     {
         maxDistance = Math.abs(maxDistance);
-        if (maxDistance == 0) return minDuration;
+        if (maxDistance == 0)
+            return minDuration;
 
         final float distance = (float) Math.sqrt(Math.abs(dx * dx) + Math.abs(dy * dy));
         final float disPercent = distance / maxDistance;
         final int duration = (int) ((disPercent * minDuration) + minDuration);
         return Math.min(duration, maxDuration);
-    }
-
-    @Deprecated
-    public interface Callback
-    {
-        /**
-         * 滚动状态变化回调
-         *
-         * @param isFinished true-滚动结束，false-滚动中
-         */
-        void onScrollStateChanged(boolean isFinished);
-
-        /**
-         * 调用{@link FScroller#computeScrollOffset()}后触发
-         *
-         * @param lastX 上一次的x
-         * @param lastY 上一次的y
-         * @param currX 当前x
-         * @param currY 当前y
-         */
-        void onScroll(int lastX, int lastY, int currX, int currY);
     }
 
     public interface ScrollerApi
@@ -345,14 +300,6 @@ public class FScroller
         public SimpleScrollerApi(Context context, Interpolator interpolator)
         {
             mScroller = new Scroller(context, interpolator);
-        }
-
-        @Deprecated
-        public SimpleScrollerApi(Scroller scroller)
-        {
-            if (scroller == null)
-                throw new NullPointerException("scroller is null");
-            mScroller = scroller;
         }
 
         @Override
