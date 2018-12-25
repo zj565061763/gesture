@@ -15,8 +15,6 @@ import com.sd.lib.gesture.FGestureManager;
 import com.sd.lib.gesture.FScroller;
 import com.sd.lib.gesture.FTouchHelper;
 
-import java.util.List;
-
 public class ViewDragFrameLayout extends FrameLayout
 {
     public ViewDragFrameLayout(Context context)
@@ -171,23 +169,7 @@ public class ViewDragFrameLayout extends FrameLayout
 
     private View findMaxTopChild(MotionEvent event)
     {
-        final List<View> list = FTouchHelper.findChildrenUnder(ViewDragFrameLayout.this, (int) event.getX(), (int) event.getY());
-
-        View maxZ = null;
-        for (View item : list)
-        {
-            if (maxZ == null)
-            {
-                maxZ = item;
-            } else
-            {
-                if (ViewCompat.getZ(item) > ViewCompat.getZ(maxZ))
-                {
-                    maxZ = item;
-                }
-            }
-        }
-        return maxZ;
+        return FTouchHelper.findTopChildUnder(this, (int) event.getX(), (int) event.getY());
     }
 
     private void offsetLeftAndRightLegal(View view, int delta)
@@ -218,10 +200,9 @@ public class ViewDragFrameLayout extends FrameLayout
         final int endX = startX < (alignLeft + alignRight) / 2 ? alignLeft : alignRight;
 
         final boolean scroll = getScroller().scrollToX(startX, endX, -1);
+
         if (scroll)
-        {
-            invalidate();
-        }
+            ViewCompat.postInvalidateOnAnimation(this);
     }
 
     private void doFling(VelocityTracker velocityTracker)
@@ -242,9 +223,7 @@ public class ViewDragFrameLayout extends FrameLayout
 
         final boolean fling = getScroller().fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
         if (fling)
-        {
-            invalidate();
-        }
+            ViewCompat.postInvalidateOnAnimation(this);
     }
 
 
@@ -337,9 +316,7 @@ public class ViewDragFrameLayout extends FrameLayout
     {
         super.computeScroll();
         if (getScroller().computeScrollOffset())
-        {
-            invalidate();
-        }
+            ViewCompat.postInvalidateOnAnimation(this);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.sd.lib.gesture;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -420,6 +421,39 @@ public class FTouchHelper
             }
         }
         return list;
+    }
+
+    /**
+     * 找到parent中处于指定坐标下最顶部的child(Z值最大，最后面添加)
+     *
+     * @param parent
+     * @param x
+     * @param y
+     * @return
+     */
+    public static View findTopChildUnder(ViewGroup parent, int x, int y)
+    {
+        if (Build.VERSION.SDK_INT < 21)
+            return parent.getChildAt(parent.getChildCount() - 1);
+
+        final List<View> list = findChildrenUnder(parent, x, y);
+        if (list.isEmpty())
+            return null;
+
+        View target = null;
+        for (View item : list)
+        {
+            if (target == null)
+            {
+                target = item;
+            } else
+            {
+                if (item.getZ() > target.getZ())
+                    target = item;
+            }
+        }
+
+        return target;
     }
 
     /**
