@@ -136,7 +136,8 @@ public class FGestureManager
                 tagConsume = consume;
             } else
             {
-                tagConsume = mCallback.shouldConsumeEvent(event);
+                if (!mIsCancelTouchEvent)
+                    tagConsume = mCallback.shouldConsumeEvent(event);
             }
         }
 
