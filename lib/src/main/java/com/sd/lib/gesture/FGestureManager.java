@@ -167,7 +167,10 @@ public class FGestureManager
                 onEventStart(event);
 
             if (!mIsCancelTouchEvent)
-                mTagHolder.setTagIntercept(mCallback.shouldInterceptEvent(event));
+            {
+                if (!mTagHolder.isTagIntercept())
+                    mTagHolder.setTagIntercept(mCallback.shouldInterceptEvent(event));
+            }
         }
 
         return mTagHolder.isTagIntercept() && !mIsCancelTouchEvent;
