@@ -199,13 +199,13 @@ public class FGestureManager
         {
             if (!mIsCancelTouchEvent)
             {
-                if (mTagHolder.isTagConsume())
+                if (!mTagHolder.isTagConsume())
+                {
+                    mTagHolder.setTagConsume(mCallback.shouldConsumeEvent(event));
+                } else
                 {
                     mCallback.onEventConsume(event);
                     mHasConsumeEvent = true;
-                } else
-                {
-                    mTagHolder.setTagConsume(mCallback.shouldConsumeEvent(event));
                 }
             }
         }
