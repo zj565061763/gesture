@@ -157,8 +157,6 @@ public class FGestureManager
         mTouchHelper.processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
-        boolean tagIntercept = false;
-
         final int action = event.getAction();
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)
         {
@@ -168,14 +166,11 @@ public class FGestureManager
             if (action == MotionEvent.ACTION_DOWN)
                 onEventStart(event);
 
-            tagIntercept = mCallback.shouldInterceptEvent(event);
+            if (!mIsCancelTouchEvent)
+                mTagHolder.setTagIntercept(mCallback.shouldInterceptEvent(event));
         }
 
-        if (mIsCancelTouchEvent)
-            tagIntercept = false;
-
-        mTagHolder.setTagIntercept(tagIntercept);
-        return mTagHolder.isTagIntercept();
+        return mTagHolder.isTagIntercept() && !mIsCancelTouchEvent;
     }
 
     /**
@@ -189,8 +184,6 @@ public class FGestureManager
         mTouchHelper.processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
-        boolean tagConsume = false;
-
         final int action = event.getAction();
         if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)
         {
@@ -198,30 +191,23 @@ public class FGestureManager
         } else if (action == MotionEvent.ACTION_DOWN)
         {
             onEventStart(event);
-            return mCallback.onEventActionDown(event);
+            return mCallback.onEventActionDown(event) && !mIsCancelTouchEvent;
         } else
         {
-            if (mTagHolder.isTagConsume())
+            if (!mIsCancelTouchEvent)
             {
-                final boolean consume = mCallback.onEventConsume(event);
-
-                // 标识消费过事件
-                if (consume)
+                if (mTagHolder.isTagConsume())
+                {
+                    mCallback.onEventConsume(event);
                     mHasConsumeEvent = true;
-
-                tagConsume = consume;
-            } else
-            {
-                if (!mIsCancelTouchEvent)
-                    tagConsume = mCallback.shouldConsumeEvent(event);
+                } else
+                {
+                    mTagHolder.setTagConsume(mCallback.shouldConsumeEvent(event));
+                }
             }
         }
 
-        if (mIsCancelTouchEvent)
-            tagConsume = false;
-
-        mTagHolder.setTagConsume(tagConsume);
-        return mTagHolder.isTagConsume();
+        return mTagHolder.isTagConsume() && !mIsCancelTouchEvent;
     }
 
     private void onEventStart(MotionEvent event)
@@ -307,9 +293,8 @@ public class FGestureManager
          * 事件回调
          *
          * @param event
-         * @return
          */
-        public abstract boolean onEventConsume(MotionEvent event);
+        public abstract void onEventConsume(MotionEvent event);
 
         /**
          * 事件结束，收到{@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}事件

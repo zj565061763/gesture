@@ -89,15 +89,13 @@ public class ViewDragFrameLayout extends FrameLayout
                 }
 
                 @Override
-                public boolean onEventConsume(MotionEvent event)
+                public void onEventConsume(MotionEvent event)
                 {
                     final int dx = (int) getGestureManager().getTouchHelper().getDeltaX();
                     final int dy = (int) getGestureManager().getTouchHelper().getDeltaY();
 
                     offsetLeftAndRightLegal(mChild, dx);
                     offsetTopAndBottomLegal(mChild, dy);
-
-                    return true;
                 }
 
                 @Override
