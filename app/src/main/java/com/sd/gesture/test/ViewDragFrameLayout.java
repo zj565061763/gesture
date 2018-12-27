@@ -38,10 +38,13 @@ public class ViewDragFrameLayout extends FrameLayout
 
     private void setChild(View child)
     {
-        if (mChild != child)
+        if (getGestureManager().getState() == FGestureManager.State.Idle)
         {
-            mChild = child;
-            Log.e(TAG, "setChild:" + child);
+            if (mChild != child)
+            {
+                mChild = child;
+                Log.e(TAG, "setChild:" + child);
+            }
         }
     }
 
@@ -63,7 +66,10 @@ public class ViewDragFrameLayout extends FrameLayout
                             break;
                         case MotionEvent.ACTION_MOVE:
                             if (mDownChild != null && canPull())
+                            {
+                                setChild(mDownChild);
                                 return true;
+                            }
                             break;
                     }
                     return false;
@@ -72,14 +78,13 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public boolean onEventActionDown(MotionEvent event)
                 {
-                    mDownChild = findMaxTopChild(event);
-                    return mDownChild != null;
+                    setChild(findMaxTopChild(event));
+                    return mChild != null;
                 }
 
                 @Override
                 public boolean shouldConsumeEvent(MotionEvent event)
                 {
-                    setChild(mDownChild);
                     return mChild != null;
                 }
 
