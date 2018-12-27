@@ -15,13 +15,17 @@
  */
 package com.sd.lib.gesture;
 
+import android.content.Context;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 
 public class FGestureManager
 {
     private final FTouchHelper mTouchHelper = new FTouchHelper();
-    private final FTagHolder mTagHolder = new FTagHolder();
+    private final TagHolder mTagHolder;
+    private final FScroller mScroller;
+
+    private State mState = State.Idle;
 
     private VelocityTracker mVelocityTracker;
 
@@ -30,31 +34,88 @@ public class FGestureManager
 
     private final Callback mCallback;
 
-    public FGestureManager(Callback callback)
+    public FGestureManager(Context context, Callback callback)
     {
         if (callback == null)
             throw new NullPointerException("callback is null");
         mCallback = callback;
+
+        mTagHolder = new TagHolder()
+        {
+            @Override
+            protected void onTagInterceptChanged(boolean tag)
+            {
+                super.onTagInterceptChanged(tag);
+            }
+
+            @Override
+            protected void onTagConsumeChanged(boolean tag)
+            {
+                if (tag)
+                    setState(State.Drag);
+
+                super.onTagConsumeChanged(tag);
+            }
+        };
+
+        mScroller = new FScroller(context)
+        {
+            @Override
+            protected void onScrollerStart()
+            {
+                setState(State.Fling);
+                super.onScrollerStart();
+            }
+
+            @Override
+            protected void onScrollerCompute(int lastX, int lastY, int currX, int currY)
+            {
+                mCallback.onScrollerCompute(lastX, lastY, currX, currY);
+                super.onScrollerCompute(lastX, lastY, currX, currY);
+            }
+
+            @Override
+            protected void onScrollerFinish(boolean isAbort)
+            {
+                if (!getTagHolder().isTagConsume())
+                    setState(State.Idle);
+
+                super.onScrollerFinish(isAbort);
+            }
+        };
     }
 
-    /**
-     * 返回触摸帮助类
-     *
-     * @return
-     */
     public FTouchHelper getTouchHelper()
     {
         return mTouchHelper;
     }
 
-    /**
-     * 返回标识持有者
-     *
-     * @return
-     */
-    public FTagHolder getTagHolder()
+    public TagHolder getTagHolder()
     {
         return mTagHolder;
+    }
+
+    public FScroller getScroller()
+    {
+        return mScroller;
+    }
+
+    public State getState()
+    {
+        return mState;
+    }
+
+    private void setState(State state)
+    {
+        if (state == null)
+            throw new NullPointerException();
+
+        final State old = mState;
+        if (old != state)
+        {
+            mState = state;
+            mCallback.onStateChanged(old, state);
+        }
     }
 
     private VelocityTracker getVelocityTracker()
@@ -178,6 +239,9 @@ public class FGestureManager
         mHasConsumeEvent = false;
         mIsCancelTouchEvent = false;
         releaseVelocityTracker();
+
+        if (mState == State.Drag)
+            setState(State.Idle);
     }
 
     public static class FinishParams
@@ -196,6 +260,13 @@ public class FGestureManager
             this.hasConsumeEvent = hasConsumeEvent;
             this.isCancelTouchEvent = isCancelTouchEvent;
         }
+    }
+
+    public enum State
+    {
+        Idle,
+        Drag,
+        Fling
     }
 
     public abstract static class Callback
@@ -248,9 +319,19 @@ public class FGestureManager
          * @param event           {@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}
          */
         public abstract void onEventFinish(FinishParams params, VelocityTracker velocityTracker, MotionEvent event);
+
+        public void onStateChanged(State oldState, State newState)
+        {
+        }
+
+        public void onScrollerCompute(int lastX, int lastY, int currX, int currY)
+        {
+        }
     }
 
-    public static class FTagHolder
+    //---------- TagHolder Start ----------
+
+    public static class TagHolder
     {
         /**
          * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
@@ -263,7 +344,7 @@ public class FGestureManager
 
         private Callback mCallback;
 
-        private FTagHolder()
+        private TagHolder()
         {
         }
 
@@ -289,30 +370,28 @@ public class FGestureManager
         /**
          * 设置是否需要拦截事件标识(用于onInterceptTouchEvent方法)
          *
-         * @param tagIntercept
+         * @param tag
          */
-        void setTagIntercept(boolean tagIntercept)
+        void setTagIntercept(boolean tag)
         {
-            if (mTagIntercept != tagIntercept)
+            if (mTagIntercept != tag)
             {
-                mTagIntercept = tagIntercept;
-                if (mCallback != null)
-                    mCallback.onTagInterceptChanged(tagIntercept);
+                mTagIntercept = tag;
+                onTagInterceptChanged(tag);
             }
         }
 
         /**
          * 设置是否需要消费事件标识(用于onTouchEvent方法)
          *
-         * @param tagConsume
+         * @param tag
          */
-        void setTagConsume(boolean tagConsume)
+        void setTagConsume(boolean tag)
         {
-            if (mTagConsume != tagConsume)
+            if (mTagConsume != tag)
             {
-                mTagConsume = tagConsume;
-                if (mCallback != null)
-                    mCallback.onTagConsumeChanged(tagConsume);
+                mTagConsume = tag;
+                onTagConsumeChanged(tag);
             }
         }
 
@@ -322,6 +401,18 @@ public class FGestureManager
             setTagConsume(false);
         }
 
+        protected void onTagInterceptChanged(boolean tag)
+        {
+            if (mCallback != null)
+                mCallback.onTagInterceptChanged(tag);
+        }
+
+        protected void onTagConsumeChanged(boolean tag)
+        {
+            if (mCallback != null)
+                mCallback.onTagConsumeChanged(tag);
+        }
+
         public interface Callback
         {
             void onTagInterceptChanged(boolean tag);
@@ -329,4 +420,6 @@ public class FGestureManager
             void onTagConsumeChanged(boolean tag);
         }
     }
+
+    //---------- TagHolder Start ----------
 }

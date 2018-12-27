@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
 import com.sd.lib.gesture.FGestureManager;
-import com.sd.lib.gesture.FScroller;
 import com.sd.lib.gesture.FTouchHelper;
 
 public class ViewDragFrameLayout extends FrameLayout
@@ -35,85 +34,36 @@ public class ViewDragFrameLayout extends FrameLayout
     private static final String TAG = ViewDragFrameLayout.class.getSimpleName();
 
     private FGestureManager mGestureManager;
-    private FScroller mScroller;
-
     private View mChild;
 
     private void setChild(View child)
     {
         if (mChild != child)
         {
-            if (getScroller().isFinished())
-            {
-                mChild = child;
-                Log.e(TAG, "setChild:" + child);
-            }
+            mChild = child;
+            Log.e(TAG, "setChild:" + child);
         }
-    }
-
-    private FScroller getScroller()
-    {
-        if (mScroller == null)
-        {
-            mScroller = new FScroller(getContext())
-            {
-                @Override
-                protected void onScrollStart()
-                {
-                    Log.i(TAG, "onScrollStart");
-                }
-
-                @Override
-                protected void onScrollCompute(int lastX, int lastY, int currX, int currY)
-                {
-                    final int dx = currX - lastX;
-                    final int dy = currY - lastY;
-
-                    Log.i(TAG, "onScrollCompute:" + dx + "," + dy);
-
-                    offsetLeftAndRightLegal(mChild, dx);
-                    offsetTopAndBottomLegal(mChild, dy);
-                }
-
-                @Override
-                protected void onScrollFinish(boolean isAbort)
-                {
-                    Log.i(TAG, "onScrollFinish isAbort:" + isAbort);
-
-                    setChild(null);
-                }
-            };
-        }
-        return mScroller;
     }
 
     private FGestureManager getGestureManager()
     {
         if (mGestureManager == null)
         {
-            mGestureManager = new FGestureManager(new FGestureManager.Callback()
+            mGestureManager = new FGestureManager(getContext(), new FGestureManager.Callback()
             {
+                private View mDownChild = null;
+
                 @Override
                 public boolean shouldInterceptEvent(MotionEvent event)
                 {
                     switch (event.getAction())
                     {
                         case MotionEvent.ACTION_DOWN:
-                            final View child = findMaxTopChild(event);
-                            setChild(child);
+                            mDownChild = findMaxTopChild(event);
                             break;
                         case MotionEvent.ACTION_MOVE:
-                            if (mChild != null)
-                            {
-                                final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFromDown();
-                                final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFromDown();
-                                final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
-
-                                if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
-                                {
-                                    return true;
-                                }
-                            }
+                            if (mDownChild != null && canPull())
+                                return true;
                             break;
                     }
                     return false;
@@ -122,17 +72,14 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public boolean onEventActionDown(MotionEvent event)
                 {
-                    if (mChild == null)
-                    {
-                        final View child = findMaxTopChild(event);
-                        setChild(child);
-                    }
-                    return mChild != null;
+                    mDownChild = findMaxTopChild(event);
+                    return mDownChild != null;
                 }
 
                 @Override
                 public boolean shouldConsumeEvent(MotionEvent event)
                 {
+                    setChild(mDownChild);
                     return mChild != null;
                 }
 
@@ -151,20 +98,54 @@ public class ViewDragFrameLayout extends FrameLayout
                 @Override
                 public void onEventFinish(FGestureManager.FinishParams params, VelocityTracker velocityTracker, MotionEvent event)
                 {
+                    mDownChild = null;
+
                     if (params.hasConsumeEvent)
                     {
                         doScroll();
-                    } else
-                    {
-                        if (getScroller().isFinished())
-                        {
-                            setChild(null);
-                        }
                     }
+                }
+
+                @Override
+                public void onStateChanged(FGestureManager.State oldState, FGestureManager.State newState)
+                {
+                    Log.i(TAG, "onStateChanged:" + newState);
+
+                    if (newState == FGestureManager.State.Fling)
+                    {
+                        ViewCompat.postInvalidateOnAnimation(ViewDragFrameLayout.this);
+                    } else if (newState == FGestureManager.State.Idle)
+                    {
+                        setChild(null);
+                    }
+                }
+
+                @Override
+                public void onScrollerCompute(int lastX, int lastY, int currX, int currY)
+                {
+                    final int dx = currX - lastX;
+                    final int dy = currY - lastY;
+
+                    offsetLeftAndRightLegal(mChild, dx);
+                    offsetTopAndBottomLegal(mChild, dy);
                 }
             });
         }
         return mGestureManager;
+    }
+
+    private boolean canPull()
+    {
+        final int dx = (int) getGestureManager().getTouchHelper().getDeltaXFromDown();
+        final int dy = (int) getGestureManager().getTouchHelper().getDeltaYFromDown();
+        final int touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+
+        if (Math.abs(dx) > touchSlop || Math.abs(dy) > touchSlop)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private View findMaxTopChild(MotionEvent event)
@@ -199,10 +180,7 @@ public class ViewDragFrameLayout extends FrameLayout
 
         final int endX = startX < (alignLeft + alignRight) / 2 ? alignLeft : alignRight;
 
-        final boolean scroll = getScroller().scrollToX(startX, endX, -1);
-
-        if (scroll)
-            ViewCompat.postInvalidateOnAnimation(this);
+        getGestureManager().getScroller().scrollToX(startX, endX, -1);
     }
 
     private void doFling(VelocityTracker velocityTracker)
@@ -221,9 +199,7 @@ public class ViewDragFrameLayout extends FrameLayout
         final int minY = getTopAlignParentTop(this, mChild, true);
         final int maxY = getTopAlignParentBottom(this, mChild, true);
 
-        final boolean fling = getScroller().fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
-        if (fling)
-            ViewCompat.postInvalidateOnAnimation(this);
+        getGestureManager().getScroller().fling(startX, startY, velocityX, velocityY, minX, maxX, minY, maxY);
     }
 
 
@@ -315,7 +291,7 @@ public class ViewDragFrameLayout extends FrameLayout
     public void computeScroll()
     {
         super.computeScroll();
-        if (getScroller().computeScrollOffset())
+        if (getGestureManager().getScroller().computeScrollOffset())
             ViewCompat.postInvalidateOnAnimation(this);
     }
 
@@ -323,6 +299,6 @@ public class ViewDragFrameLayout extends FrameLayout
     protected void onLayout(boolean changed, int left, int top, int right, int bottom)
     {
         super.onLayout(changed, left, top, right, bottom);
-        getScroller().setMaxScrollDistance(getHeight());
+        getGestureManager().getScroller().setMaxScrollDistance(getHeight());
     }
 }
