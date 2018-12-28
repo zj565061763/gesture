@@ -134,6 +134,8 @@ public class ViewDragFrameLayout extends FrameLayout
 
                     offsetLeftAndRightLegal(mChild, dx);
                     offsetTopAndBottomLegal(mChild, dy);
+
+                    Log.i(TAG, "onScrollerCompute:" + mChild.getLeft() + " , " + mChild.getTop());
                 }
             });
             mGestureManager.setDebug(true);
