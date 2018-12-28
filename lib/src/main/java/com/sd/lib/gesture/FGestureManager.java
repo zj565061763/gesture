@@ -22,15 +22,13 @@ import android.view.VelocityTracker;
 public class FGestureManager
 {
     private final FTouchHelper mTouchHelper = new FTouchHelper();
-    private final TagHolder mTagHolder;
+    private final EventTag mEventTag;
     private final FScroller mScroller;
 
     private State mState = State.Idle;
+    private LifecycleInfo mLifecycleInfo;
 
     private VelocityTracker mVelocityTracker;
-
-    private boolean mHasConsumeEvent = false;
-    private boolean mCancelConsumeEvent = false;
 
     private final Callback mCallback;
 
@@ -40,14 +38,8 @@ public class FGestureManager
             throw new NullPointerException("callback is null");
         mCallback = callback;
 
-        mTagHolder = new TagHolder()
+        mEventTag = new EventTag()
         {
-            @Override
-            protected void onTagInterceptChanged(boolean tag)
-            {
-                super.onTagInterceptChanged(tag);
-            }
-
             @Override
             protected void onTagConsumeChanged(boolean tag)
             {
@@ -77,7 +69,7 @@ public class FGestureManager
             @Override
             protected void onScrollerFinish(boolean isAbort)
             {
-                if (!getTagHolder().isTagConsume())
+                if (!getEventTag().isTagConsume())
                     setState(State.Idle);
 
                 super.onScrollerFinish(isAbort);
@@ -90,9 +82,9 @@ public class FGestureManager
         return mTouchHelper;
     }
 
-    public TagHolder getTagHolder()
+    public EventTag getEventTag()
     {
-        return mTagHolder;
+        return mEventTag;
     }
 
     public FScroller getScroller()
@@ -103,6 +95,13 @@ public class FGestureManager
     public State getState()
     {
         return mState;
+    }
+
+    public LifecycleInfo getLifecycleInfo()
+    {
+        if (mLifecycleInfo == null)
+            mLifecycleInfo = new LifecycleInfo();
+        return mLifecycleInfo;
     }
 
     private void setState(State state)
@@ -139,10 +138,11 @@ public class FGestureManager
      */
     public void cancelConsumeEvent()
     {
-        if (mTagHolder.isTagConsume() || mTagHolder.isTagIntercept())
+        if (mEventTag.isTagConsume())
         {
-            mCancelConsumeEvent = true;
-            mTagHolder.reset();
+            getLifecycleInfo().setCancelConsumeEvent(true);
+            mEventTag.reset();
+            mCallback.onCancelConsumeEvent();
         }
     }
 
@@ -166,11 +166,11 @@ public class FGestureManager
             if (action == MotionEvent.ACTION_DOWN)
                 onEventStart(event);
 
-            if (!mTagHolder.isTagIntercept())
-                mTagHolder.setTagIntercept(mCallback.shouldInterceptEvent(event));
+            if (!mEventTag.isTagIntercept())
+                mEventTag.setTagIntercept(mCallback.shouldInterceptEvent(event));
         }
 
-        return mTagHolder.isTagIntercept();
+        return mEventTag.isTagIntercept();
     }
 
     /**
@@ -194,20 +194,20 @@ public class FGestureManager
             return mCallback.onEventActionDown(event);
         } else
         {
-            if (!mCancelConsumeEvent)
+            if (!getLifecycleInfo().cancelConsumeEvent())
             {
-                if (!mTagHolder.isTagConsume())
+                if (!mEventTag.isTagConsume())
                 {
-                    mTagHolder.setTagConsume(mCallback.shouldConsumeEvent(event));
+                    mEventTag.setTagConsume(mCallback.shouldConsumeEvent(event));
                 } else
                 {
                     mCallback.onEventConsume(event);
-                    mHasConsumeEvent = true;
+                    getLifecycleInfo().setHasConsumeEvent(true);
                 }
             }
         }
 
-        return mTagHolder.isTagConsume();
+        return mEventTag.isTagConsume();
     }
 
     private void onEventStart(MotionEvent event)
@@ -217,34 +217,55 @@ public class FGestureManager
 
     private void onEventFinish(MotionEvent event)
     {
-        mTagHolder.reset();
-
-        final FinishParams params = new FinishParams(mHasConsumeEvent, mCancelConsumeEvent);
-        mCallback.onEventFinish(params, getVelocityTracker(), event);
-
-        mHasConsumeEvent = false;
-        mCancelConsumeEvent = false;
-        releaseVelocityTracker();
+        mEventTag.reset();
+        mCallback.onEventFinish(getVelocityTracker(), event);
 
         if (mState == State.Consume)
             setState(State.Idle);
+
+        getLifecycleInfo().reset();
+        releaseVelocityTracker();
     }
 
-    public static class FinishParams
+    public static class LifecycleInfo
     {
-        /**
-         * 本次按下到结束的过程中{@link Callback#onEventConsume(MotionEvent)}方法是否消费过事件
-         */
-        public final boolean hasConsumeEvent;
-        /**
-         * 在消费事件的过程中是否调用过{@link #cancelConsumeEvent()}方法
-         */
-        public final boolean cancelConsumeEvent;
+        private boolean hasConsumeEvent;
+        private boolean cancelConsumeEvent;
 
-        private FinishParams(boolean hasConsumeEvent, boolean cancelConsumeEvent)
+        /**
+         * 从按下到当前{@link Callback#onEventConsume(MotionEvent)}方法是否消费过事件
+         *
+         * @return
+         */
+        public boolean hasConsumeEvent()
+        {
+            return hasConsumeEvent;
+        }
+
+        /**
+         * 是否取消过消费事件
+         *
+         * @return
+         */
+        public boolean cancelConsumeEvent()
+        {
+            return cancelConsumeEvent;
+        }
+
+        void setHasConsumeEvent(boolean hasConsumeEvent)
         {
             this.hasConsumeEvent = hasConsumeEvent;
+        }
+
+        void setCancelConsumeEvent(boolean cancelConsumeEvent)
+        {
             this.cancelConsumeEvent = cancelConsumeEvent;
+        }
+
+        void reset()
+        {
+            this.hasConsumeEvent = false;
+            this.cancelConsumeEvent = false;
         }
     }
 
@@ -297,13 +318,19 @@ public class FGestureManager
         public abstract void onEventConsume(MotionEvent event);
 
         /**
+         * 取消消费事件回调
+         */
+        public void onCancelConsumeEvent()
+        {
+        }
+
+        /**
          * 事件结束，收到{@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}事件
          *
-         * @param params          {@link FinishParams}
          * @param velocityTracker 速率计算对象，这里返回的对象还未进行速率计算，如果要获得速率需要先进行计算{@link VelocityTracker#computeCurrentVelocity(int)}
          * @param event           {@link MotionEvent#ACTION_UP}或者{@link MotionEvent#ACTION_CANCEL}
          */
-        public abstract void onEventFinish(FinishParams params, VelocityTracker velocityTracker, MotionEvent event);
+        public abstract void onEventFinish(VelocityTracker velocityTracker, MotionEvent event);
 
         public void onStateChanged(State oldState, State newState)
         {
@@ -314,9 +341,9 @@ public class FGestureManager
         }
     }
 
-    //---------- TagHolder Start ----------
+    //---------- EventTag Start ----------
 
-    public static class TagHolder
+    public static class EventTag
     {
         /**
          * 是否需要拦截事件标识(用于onInterceptTouchEvent方法)
@@ -329,7 +356,7 @@ public class FGestureManager
 
         private Callback mCallback;
 
-        private TagHolder()
+        private EventTag()
         {
         }
 
@@ -406,5 +433,5 @@ public class FGestureManager
         }
     }
 
-    //---------- TagHolder Start ----------
+    //---------- EventTag Start ----------
 }

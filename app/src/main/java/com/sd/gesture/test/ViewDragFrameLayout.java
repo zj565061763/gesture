@@ -99,11 +99,11 @@ public class ViewDragFrameLayout extends FrameLayout
                 }
 
                 @Override
-                public void onEventFinish(FGestureManager.FinishParams params, VelocityTracker velocityTracker, MotionEvent event)
+                public void onEventFinish(VelocityTracker velocityTracker, MotionEvent event)
                 {
                     mDownChild = null;
 
-                    if (params.hasConsumeEvent)
+                    if (mGestureManager.getLifecycleInfo().hasConsumeEvent())
                     {
                         doScroll();
                     }
