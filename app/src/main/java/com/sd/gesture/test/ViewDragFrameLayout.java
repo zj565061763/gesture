@@ -114,7 +114,10 @@ public class ViewDragFrameLayout extends FrameLayout
                 {
                     Log.i(TAG, "onStateChanged:" + newState);
 
-                    if (newState == FGestureManager.State.Fling)
+                    if (newState == FGestureManager.State.Consume)
+                    {
+
+                    } else if (newState == FGestureManager.State.Fling)
                     {
                         ViewCompat.postInvalidateOnAnimation(ViewDragFrameLayout.this);
                     } else if (newState == FGestureManager.State.Idle)
