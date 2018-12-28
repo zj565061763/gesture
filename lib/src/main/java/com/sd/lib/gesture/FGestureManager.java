@@ -84,9 +84,15 @@ public class FGestureManager
                     Log.e(FGestureManager.class.getSimpleName(), "onScrollerFinish isAbort:" + isAbort);
 
                 if (mTagHolder.isTagConsume())
+                {
                     setState(State.Consume);
-                else
-                    postIdleRunnable();
+                } else
+                {
+                    if (isAbort)
+                        postIdleRunnable();
+                    else
+                        setState(State.Idle);
+                }
 
                 super.onScrollerFinish(isAbort);
             }
