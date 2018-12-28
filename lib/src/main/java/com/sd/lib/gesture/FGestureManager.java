@@ -286,6 +286,9 @@ public class FGestureManager
         @Override
         public void run()
         {
+            if (mIdleRunnable == this)
+                mIdleRunnable = null;
+
             if (mState == mLastState)
             {
                 if (mDebug)
