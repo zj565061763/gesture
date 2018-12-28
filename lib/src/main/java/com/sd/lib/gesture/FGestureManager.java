@@ -23,7 +23,7 @@ public class FGestureManager
 {
     private final ViewGroup mViewGroup;
 
-    private final FTouchHelper mTouchHelper = new FTouchHelper();
+    private FTouchHelper mTouchHelper;
     private final EventTag mEventTag;
     private final FScroller mScroller;
 
@@ -83,6 +83,8 @@ public class FGestureManager
 
     public FTouchHelper getTouchHelper()
     {
+        if (mTouchHelper == null)
+            mTouchHelper = new FTouchHelper();
         return mTouchHelper;
     }
 
@@ -180,7 +182,7 @@ public class FGestureManager
      */
     public boolean onInterceptTouchEvent(MotionEvent event)
     {
-        mTouchHelper.processTouchEvent(event);
+        getTouchHelper().processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
         final int action = event.getAction();
@@ -207,7 +209,7 @@ public class FGestureManager
      */
     public boolean onTouchEvent(MotionEvent event)
     {
-        mTouchHelper.processTouchEvent(event);
+        getTouchHelper().processTouchEvent(event);
         getVelocityTracker().addMovement(event);
 
         final int action = event.getAction();
