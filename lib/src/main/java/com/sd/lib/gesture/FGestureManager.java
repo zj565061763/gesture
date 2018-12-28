@@ -83,7 +83,11 @@ public class FGestureManager
                 if (mDebug)
                     Log.e(FGestureManager.class.getSimpleName(), "onScrollerFinish isAbort:" + isAbort);
 
-                setIdleIfNeed();
+                if (mTagHolder.isTagConsume())
+                    setState(State.Consume);
+                else
+                    postIdleRunnable();
+
                 super.onScrollerFinish(isAbort);
             }
         };
@@ -157,14 +161,11 @@ public class FGestureManager
         }
     }
 
-    private void setIdleIfNeed()
+    private void postIdleRunnable()
     {
-        if (getScroller().isFinished() && !mTagHolder.isTagConsume())
-        {
-            cancelIdleRunnable();
-            mIdleRunnable = new IdleRunnable(mState);
-            mIdleRunnable.post();
-        }
+        cancelIdleRunnable();
+        mIdleRunnable = new IdleRunnable(mState);
+        mIdleRunnable.post();
     }
 
     private void cancelIdleRunnable()
@@ -188,8 +189,11 @@ public class FGestureManager
 
             getLifecycleInfo().setCancelConsumeEvent(true);
             mTagHolder.reset();
+
+            if (getScroller().isFinished())
+                postIdleRunnable();
+
             mCallback.onCancelConsumeEvent();
-            setIdleIfNeed();
         }
     }
 
@@ -287,6 +291,7 @@ public class FGestureManager
         @Override
         public void run()
         {
+            mPost = false;
             if (mIdleRunnable == this)
                 mIdleRunnable = null;
 
