@@ -52,7 +52,7 @@ public class FGestureManager
             protected void onTagConsumeChanged(boolean tag)
             {
                 if (tag)
-                    setState(State.Drag);
+                    setState(State.Consume);
 
                 super.onTagConsumeChanged(tag);
             }
@@ -226,7 +226,7 @@ public class FGestureManager
         mCancelConsumeEvent = false;
         releaseVelocityTracker();
 
-        if (mState == State.Drag)
+        if (mState == State.Consume)
             setState(State.Idle);
     }
 
@@ -251,7 +251,7 @@ public class FGestureManager
     public enum State
     {
         Idle,
-        Drag,
+        Consume,
         Fling
     }
 
