@@ -188,11 +188,17 @@ public class FGestureManager
                 Log.i(FGestureManager.class.getSimpleName(), "cancelConsumeEvent");
 
             getLifecycleInfo().setCancelConsumeEvent(true);
-            mTagHolder.reset();
 
             if (getScroller().isFinished())
+            {
+                /**
+                 * 调用取消消费事件方法之后，外部有可能立即调用滚动的方法变更状态为{@link State.Fling}
+                 * 所以此处延迟设置{@link State.Idle}状态
+                 */
                 postIdleRunnable();
+            }
 
+            mTagHolder.reset();
             mCallback.onCancelConsumeEvent();
         }
     }
