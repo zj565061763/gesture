@@ -370,8 +370,17 @@ public class FGestureManager
 
     public enum State
     {
+        /**
+         * 空闲
+         */
         Idle,
+        /**
+         * 消费事件
+         */
         Consume,
+        /**
+         * Scroller滚动
+         */
         Fling
     }
 
@@ -431,9 +440,13 @@ public class FGestureManager
          */
         public abstract void onEventFinish(VelocityTracker velocityTracker, MotionEvent event);
 
-        public void onStateChanged(State oldState, State newState)
-        {
-        }
+        /**
+         * 状态变化回调{@link State}
+         *
+         * @param oldState
+         * @param newState
+         */
+        public abstract void onStateChanged(State oldState, State newState);
 
         public abstract void onScrollerCompute(int lastX, int lastY, int currX, int currY);
     }
