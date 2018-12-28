@@ -46,7 +46,7 @@ public abstract class FScroller
 
     public FScroller(Context context)
     {
-        this(new SimpleScrollerApi(context));
+        this(context, null);
     }
 
     public FScroller(Context context, Interpolator interpolator)
@@ -86,6 +86,9 @@ public abstract class FScroller
      */
     public void setScrollerApi(ScrollerApi scrollerApi)
     {
+        if (scrollerApi == null)
+            throw new NullPointerException();
+
         mScrollerApi = scrollerApi;
     }
 
@@ -363,11 +366,6 @@ public abstract class FScroller
     private static class SimpleScrollerApi implements FScroller.ScrollerApi
     {
         private final Scroller mScroller;
-
-        public SimpleScrollerApi(Context context)
-        {
-            mScroller = new Scroller(context);
-        }
 
         public SimpleScrollerApi(Context context, Interpolator interpolator)
         {
