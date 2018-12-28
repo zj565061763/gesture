@@ -52,7 +52,7 @@ public class ViewDragFrameLayout extends FrameLayout
     {
         if (mGestureManager == null)
         {
-            mGestureManager = new FGestureManager(getContext(), new FGestureManager.Callback()
+            mGestureManager = new FGestureManager(this, new FGestureManager.Callback()
             {
                 private View mDownChild = null;
 

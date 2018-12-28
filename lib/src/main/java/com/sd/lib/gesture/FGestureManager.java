@@ -15,12 +15,14 @@
  */
 package com.sd.lib.gesture;
 
-import android.content.Context;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.view.ViewGroup;
 
 public class FGestureManager
 {
+    private final ViewGroup mViewGroup;
+
     private final FTouchHelper mTouchHelper = new FTouchHelper();
     private final EventTag mEventTag;
     private final FScroller mScroller;
@@ -28,14 +30,18 @@ public class FGestureManager
     private State mState = State.Idle;
     private LifecycleInfo mLifecycleInfo;
 
+    private IdleRunnable mIdleRunnable;
+
     private VelocityTracker mVelocityTracker;
 
     private final Callback mCallback;
 
-    public FGestureManager(Context context, Callback callback)
+    public FGestureManager(ViewGroup viewGroup, Callback callback)
     {
-        if (callback == null)
-            throw new NullPointerException("callback is null");
+        if (viewGroup == null || callback == null)
+            throw new NullPointerException();
+
+        mViewGroup = viewGroup;
         mCallback = callback;
 
         mEventTag = new EventTag()
@@ -50,7 +56,7 @@ public class FGestureManager
             }
         };
 
-        mScroller = new FScroller(context)
+        mScroller = new FScroller(viewGroup.getContext())
         {
             @Override
             protected void onScrollerStart()
@@ -69,9 +75,7 @@ public class FGestureManager
             @Override
             protected void onScrollerFinish(boolean isAbort)
             {
-                if (!getEventTag().isTagConsume())
-                    setState(State.Idle);
-
+                setIdleIfNeed();
                 super.onScrollerFinish(isAbort);
             }
         };
@@ -109,6 +113,8 @@ public class FGestureManager
         if (state == null)
             throw new NullPointerException();
 
+        cancelIdleRunnable();
+
         final State old = mState;
         if (old != state)
         {
@@ -133,6 +139,25 @@ public class FGestureManager
         }
     }
 
+    private void setIdleIfNeed()
+    {
+        if (getScroller().isFinished() && !mEventTag.isTagConsume())
+        {
+            cancelIdleRunnable();
+            mIdleRunnable = new IdleRunnable(mState);
+            mIdleRunnable.post();
+        }
+    }
+
+    private void cancelIdleRunnable()
+    {
+        if (mIdleRunnable != null)
+        {
+            mIdleRunnable.cancel();
+            mIdleRunnable = null;
+        }
+    }
+
     /**
      * 取消消费事件
      */
@@ -143,6 +168,7 @@ public class FGestureManager
             getLifecycleInfo().setCancelConsumeEvent(true);
             mEventTag.reset();
             mCallback.onCancelConsumeEvent();
+            setIdleIfNeed();
         }
     }
 
@@ -227,7 +253,35 @@ public class FGestureManager
         releaseVelocityTracker();
     }
 
-    public static class LifecycleInfo
+    private final class IdleRunnable implements Runnable
+    {
+        private final State mLastState;
+
+        public IdleRunnable(State state)
+        {
+            mLastState = state;
+        }
+
+        @Override
+        public void run()
+        {
+            if (mState == mLastState)
+                setState(State.Idle);
+        }
+
+        public void post()
+        {
+            cancel();
+            mViewGroup.post(this);
+        }
+
+        public void cancel()
+        {
+            mViewGroup.removeCallbacks(this);
+        }
+    }
+
+    public static final class LifecycleInfo
     {
         private boolean hasConsumeEvent;
         private boolean cancelConsumeEvent;
