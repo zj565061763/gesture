@@ -309,10 +309,11 @@ public class FGestureManager
 
         public void cancel()
         {
-            mViewGroup.removeCallbacks(this);
-
-            if (mDebug)
-                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel:" + this);
+            if (mViewGroup.removeCallbacks(this))
+            {
+                if (mDebug)
+                    Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel:" + this);
+            }
         }
     }
 
