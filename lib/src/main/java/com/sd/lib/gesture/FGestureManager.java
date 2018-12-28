@@ -129,7 +129,7 @@ public class FGestureManager
             throw new NullPointerException();
 
         if (mDebug)
-            Log.i(FGestureManager.class.getSimpleName(), "setState:" + state);
+            Log.i(FGestureManager.class.getSimpleName(), "setState:" + mState + " -> " + state);
 
         cancelIdleRunnable();
 
