@@ -277,11 +277,11 @@ public class FGestureManager
         mTagHolder.reset();
         mCallback.onEventFinish(getVelocityTracker(), event);
 
+        releaseVelocityTracker();
+        getLifecycleInfo().reset();
+
         if (mState == State.Consume)
             setState(State.Idle);
-
-        getLifecycleInfo().reset();
-        releaseVelocityTracker();
     }
 
     private final class IdleRunnable implements Runnable
