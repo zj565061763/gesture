@@ -435,9 +435,7 @@ public class FGestureManager
         {
         }
 
-        public void onScrollerCompute(int lastX, int lastY, int currX, int currY)
-        {
-        }
+        public abstract void onScrollerCompute(int lastX, int lastY, int currX, int currY);
     }
 
     //---------- TagHolder Start ----------
