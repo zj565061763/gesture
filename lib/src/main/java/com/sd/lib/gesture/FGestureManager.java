@@ -15,6 +15,7 @@
  */
 package com.sd.lib.gesture;
 
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.ViewGroup;
@@ -31,8 +32,9 @@ public class FGestureManager
     private LifecycleInfo mLifecycleInfo;
 
     private IdleRunnable mIdleRunnable;
-
     private VelocityTracker mVelocityTracker;
+
+    private boolean mDebug;
 
     private final Callback mCallback;
 
@@ -61,6 +63,9 @@ public class FGestureManager
             @Override
             protected void onScrollerStart()
             {
+                if (mDebug)
+                    Log.i(FGestureManager.class.getSimpleName(), "onScrollerStart");
+
                 setState(State.Fling);
                 super.onScrollerStart();
             }
@@ -75,10 +80,18 @@ public class FGestureManager
             @Override
             protected void onScrollerFinish(boolean isAbort)
             {
+                if (mDebug)
+                    Log.e(FGestureManager.class.getSimpleName(), "onScrollerFinish isAbort:" + isAbort);
+
                 setIdleIfNeed();
                 super.onScrollerFinish(isAbort);
             }
         };
+    }
+
+    public void setDebug(boolean debug)
+    {
+        mDebug = debug;
     }
 
     public FTouchHelper getTouchHelper()
@@ -114,6 +127,9 @@ public class FGestureManager
     {
         if (state == null)
             throw new NullPointerException();
+
+        if (mDebug)
+            Log.i(FGestureManager.class.getSimpleName(), "setState:" + state);
 
         cancelIdleRunnable();
 
@@ -167,6 +183,9 @@ public class FGestureManager
     {
         if (mEventTag.isTagConsume())
         {
+            if (mDebug)
+                Log.i(FGestureManager.class.getSimpleName(), "cancelConsumeEvent");
+
             getLifecycleInfo().setCancelConsumeEvent(true);
             mEventTag.reset();
             mCallback.onCancelConsumeEvent();
@@ -268,18 +287,29 @@ public class FGestureManager
         public void run()
         {
             if (mState == mLastState)
+            {
+                if (mDebug)
+                    Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable run:" + this);
+
                 setState(State.Idle);
+            }
         }
 
         public void post()
         {
             cancel();
             mViewGroup.post(this);
+
+            if (mDebug)
+                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable post:" + this);
         }
 
         public void cancel()
         {
             mViewGroup.removeCallbacks(this);
+
+            if (mDebug)
+                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel:" + this);
         }
     }
 
