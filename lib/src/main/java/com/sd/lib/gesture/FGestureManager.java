@@ -277,6 +277,7 @@ public class FGestureManager
     private final class IdleRunnable implements Runnable
     {
         private final State mLastState;
+        private boolean mPost;
 
         public IdleRunnable(State state)
         {
@@ -302,6 +303,7 @@ public class FGestureManager
         {
             cancel();
             mViewGroup.post(this);
+            mPost = true;
 
             if (mDebug)
                 Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable post:" + this);
@@ -309,7 +311,9 @@ public class FGestureManager
 
         public void cancel()
         {
-            if (mViewGroup.removeCallbacks(this))
+            mViewGroup.removeCallbacks(this);
+
+            if (mPost)
             {
                 if (mDebug)
                     Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel:" + this);
