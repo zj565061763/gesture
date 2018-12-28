@@ -30,7 +30,7 @@ public class FGestureManager
     private VelocityTracker mVelocityTracker;
 
     private boolean mHasConsumeEvent = false;
-    private boolean mIsCancelTouchEvent = false;
+    private boolean mCancelConsumeEvent = false;
 
     private final Callback mCallback;
 
@@ -135,13 +135,13 @@ public class FGestureManager
     }
 
     /**
-     * 设置取消触摸事件
+     * 取消消费事件
      */
-    public void setCancelTouchEvent()
+    public void cancelConsumeEvent()
     {
         if (mTagHolder.isTagConsume() || mTagHolder.isTagIntercept())
         {
-            mIsCancelTouchEvent = true;
+            mCancelConsumeEvent = true;
             mTagHolder.reset();
         }
     }
@@ -166,14 +166,11 @@ public class FGestureManager
             if (action == MotionEvent.ACTION_DOWN)
                 onEventStart(event);
 
-            if (!mIsCancelTouchEvent)
-            {
-                if (!mTagHolder.isTagIntercept())
-                    mTagHolder.setTagIntercept(mCallback.shouldInterceptEvent(event));
-            }
+            if (!mTagHolder.isTagIntercept())
+                mTagHolder.setTagIntercept(mCallback.shouldInterceptEvent(event));
         }
 
-        return mTagHolder.isTagIntercept() && !mIsCancelTouchEvent;
+        return mTagHolder.isTagIntercept();
     }
 
     /**
@@ -194,10 +191,10 @@ public class FGestureManager
         } else if (action == MotionEvent.ACTION_DOWN)
         {
             onEventStart(event);
-            return mCallback.onEventActionDown(event) && !mIsCancelTouchEvent;
+            return mCallback.onEventActionDown(event);
         } else
         {
-            if (!mIsCancelTouchEvent)
+            if (!mCancelConsumeEvent)
             {
                 if (!mTagHolder.isTagConsume())
                 {
@@ -210,7 +207,7 @@ public class FGestureManager
             }
         }
 
-        return mTagHolder.isTagConsume() && !mIsCancelTouchEvent;
+        return mTagHolder.isTagConsume();
     }
 
     private void onEventStart(MotionEvent event)
@@ -222,11 +219,11 @@ public class FGestureManager
     {
         mTagHolder.reset();
 
-        final FinishParams params = new FinishParams(mHasConsumeEvent, mIsCancelTouchEvent);
+        final FinishParams params = new FinishParams(mHasConsumeEvent, mCancelConsumeEvent);
         mCallback.onEventFinish(params, getVelocityTracker(), event);
 
         mHasConsumeEvent = false;
-        mIsCancelTouchEvent = false;
+        mCancelConsumeEvent = false;
         releaseVelocityTracker();
 
         if (mState == State.Drag)
@@ -240,14 +237,14 @@ public class FGestureManager
          */
         public final boolean hasConsumeEvent;
         /**
-         * 本次按下到结束的过程中是否调用过{@link #setCancelTouchEvent()}方法，取消事件
+         * 在消费事件的过程中是否调用过{@link #cancelConsumeEvent()}方法
          */
-        public final boolean isCancelTouchEvent;
+        public final boolean cancelConsumeEvent;
 
-        private FinishParams(boolean hasConsumeEvent, boolean isCancelTouchEvent)
+        private FinishParams(boolean hasConsumeEvent, boolean cancelConsumeEvent)
         {
             this.hasConsumeEvent = hasConsumeEvent;
-            this.isCancelTouchEvent = isCancelTouchEvent;
+            this.cancelConsumeEvent = cancelConsumeEvent;
         }
     }
 
