@@ -170,7 +170,7 @@ public class FGestureManager
     private void postIdleRunnable()
     {
         cancelIdleRunnable();
-        mIdleRunnable = new IdleRunnable(mState);
+        mIdleRunnable = new IdleRunnable();
         mIdleRunnable.post();
     }
 
@@ -292,13 +292,7 @@ public class FGestureManager
 
     private final class IdleRunnable implements Runnable
     {
-        private final State mLastState;
         private boolean mPost;
-
-        public IdleRunnable(State state)
-        {
-            mLastState = state;
-        }
 
         @Override
         public void run()
@@ -307,18 +301,15 @@ public class FGestureManager
             if (mIdleRunnable == this)
                 mIdleRunnable = null;
 
-            if (mState == mLastState)
-            {
-                if (mDebug)
-                    Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable run:" + this);
+            if (mDebug)
+                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable run:" + this);
 
-                setState(State.Idle);
-            }
+            setState(State.Idle);
         }
 
         public void post()
         {
-            cancel();
+            mViewGroup.removeCallbacks(this);
             mViewGroup.post(this);
             mPost = true;
 
