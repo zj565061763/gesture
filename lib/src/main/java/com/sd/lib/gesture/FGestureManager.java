@@ -88,10 +88,7 @@ public class FGestureManager
                     setState(State.Consume);
                 } else
                 {
-                    if (isAbort)
-                        postIdleRunnable();
-                    else
-                        setState(State.Idle);
+                    postIdleRunnable();
                 }
 
                 super.onScrollerFinish(isAbort);
