@@ -287,23 +287,21 @@ public class FGestureManager
 
         public void post()
         {
+            if (mDebug)
+                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable post");
+
             mViewGroup.removeCallbacks(this);
             mViewGroup.post(this);
             mPost = true;
-
-            if (mDebug)
-                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable post");
         }
 
         public void cancel()
         {
-            mViewGroup.removeCallbacks(this);
+            if (mDebug && mPost)
+                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel");
 
-            if (mPost)
-            {
-                if (mDebug)
-                    Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel");
-            }
+            mViewGroup.removeCallbacks(this);
+            mPost = false;
         }
     }
 
