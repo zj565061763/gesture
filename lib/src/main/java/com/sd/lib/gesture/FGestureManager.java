@@ -31,7 +31,7 @@ public class FGestureManager
     private State mState = State.Idle;
     private LifecycleInfo mLifecycleInfo;
 
-    private IdleRunnable mIdleRunnable;
+    private final IdleRunnable mIdleRunnable = new IdleRunnable();
     private VelocityTracker mVelocityTracker;
 
     private boolean mDebug;
@@ -88,7 +88,7 @@ public class FGestureManager
                     setState(State.Consume);
                 } else
                 {
-                    postIdleRunnable();
+                    mIdleRunnable.post();
                 }
 
                 super.onScrollerFinish(isAbort);
@@ -138,7 +138,7 @@ public class FGestureManager
         if (mDebug)
             Log.i(FGestureManager.class.getSimpleName(), "setState:" + mState + " -> " + state);
 
-        cancelIdleRunnable();
+        mIdleRunnable.cancel();
 
         final State old = mState;
         if (old != state)
@@ -164,22 +164,6 @@ public class FGestureManager
         }
     }
 
-    private void postIdleRunnable()
-    {
-        cancelIdleRunnable();
-        mIdleRunnable = new IdleRunnable();
-        mIdleRunnable.post();
-    }
-
-    private void cancelIdleRunnable()
-    {
-        if (mIdleRunnable != null)
-        {
-            mIdleRunnable.cancel();
-            mIdleRunnable = null;
-        }
-    }
-
     /**
      * 取消消费事件
      */
@@ -198,7 +182,7 @@ public class FGestureManager
                  * 调用取消消费事件方法之后，外部有可能立即调用滚动的方法变更状态为{@link State.Fling}
                  * 所以此处延迟设置{@link State.Idle}状态
                  */
-                postIdleRunnable();
+                mIdleRunnable.post();
             }
 
             mTagHolder.reset();
@@ -294,13 +278,10 @@ public class FGestureManager
         @Override
         public void run()
         {
-            mPost = false;
-            if (mIdleRunnable == this)
-                mIdleRunnable = null;
-
             if (mDebug)
-                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable run:" + this);
+                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable run");
 
+            mPost = false;
             setState(State.Idle);
         }
 
@@ -311,7 +292,7 @@ public class FGestureManager
             mPost = true;
 
             if (mDebug)
-                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable post:" + this);
+                Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable post");
         }
 
         public void cancel()
@@ -321,7 +302,7 @@ public class FGestureManager
             if (mPost)
             {
                 if (mDebug)
-                    Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel:" + this);
+                    Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable cancel");
             }
         }
     }
