@@ -63,9 +63,6 @@ public class FGestureManager
             @Override
             protected void onScrollerStart()
             {
-                if (mDebug)
-                    Log.i(FGestureManager.class.getSimpleName(), "onScrollerStart");
-
                 setState(State.Fling);
                 super.onScrollerStart();
             }
