@@ -290,7 +290,6 @@ public class FGestureManager
             if (mDebug)
                 Log.i(FGestureManager.class.getSimpleName(), "IdleRunnable post");
 
-            mViewGroup.removeCallbacks(this);
             mViewGroup.post(this);
             mPost = true;
         }
