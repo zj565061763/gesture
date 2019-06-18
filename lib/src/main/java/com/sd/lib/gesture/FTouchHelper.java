@@ -8,7 +8,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -294,16 +294,14 @@ public class FTouchHelper
      */
     public static List<View> findChildrenUnder(ViewGroup parent, int x, int y)
     {
-        final List<View> list = new ArrayList<>(2);
+        final List<View> list = new LinkedList<>();
 
         final int count = parent.getChildCount();
         for (int i = count - 1; i >= 0; i--)
         {
             final View child = parent.getChildAt(i);
             if (isViewUnder(child, x, y))
-            {
                 list.add(child);
-            }
         }
         return list;
     }
@@ -325,17 +323,11 @@ public class FTouchHelper
         if (list.isEmpty())
             return null;
 
-        View target = null;
+        View target = list.remove(0);
         for (View item : list)
         {
-            if (target == null)
-            {
+            if (item.getZ() > target.getZ())
                 target = item;
-            } else
-            {
-                if (item.getZ() > target.getZ())
-                    target = item;
-            }
         }
 
         return target;
